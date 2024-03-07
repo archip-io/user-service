@@ -36,6 +36,6 @@ public class ResetPasswordDto {
           max = MAX_PASSWORD_LENGTH,
           message = "{validation.password.length}")
   @Pattern(regexp = PASSWORD_REGEX, message = "{validation.password.pattern}")
-  @Schema(description = "Сообщение ошибки", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(description = "Пароль", requiredMode = Schema.RequiredMode.REQUIRED)
   private String password;
 }

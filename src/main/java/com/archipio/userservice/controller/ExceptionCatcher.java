@@ -7,6 +7,7 @@ import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import com.archipio.userservice.dto.ErrorDto;
+import com.archipio.userservice.exception.BadPasswordException;
 import com.archipio.userservice.exception.EmailAlreadyExistsException;
 import com.archipio.userservice.exception.UserNotFoundException;
 import com.archipio.userservice.exception.UsernameAlreadyExistsException;
@@ -145,15 +146,28 @@ public class ExceptionCatcher {
 
   @ExceptionHandler(UserNotFoundException.class)
   public ResponseEntity<ErrorDto> handleUserNotFoundException(
-      HttpServletRequest request, UserNotFoundException e) {
+          HttpServletRequest request, UserNotFoundException e) {
     return ResponseEntity.status(NOT_FOUND)
-        .body(
-            ErrorDto.builder()
-                .createdAt(Instant.now())
-                .message(
-                    messageSource.getMessage(
-                        "exception.user-not-found", null, RequestContextUtils.getLocale(request)))
-                .build());
+            .body(
+                    ErrorDto.builder()
+                            .createdAt(Instant.now())
+                            .message(
+                                    messageSource.getMessage(
+                                            "exception.user-not-found", null, RequestContextUtils.getLocale(request)))
+                            .build());
+  }
+
+  @ExceptionHandler(BadPasswordException.class)
+  public ResponseEntity<ErrorDto> handleBadPasswordException(
+          HttpServletRequest request, BadPasswordException e) {
+    return ResponseEntity.status(BAD_REQUEST)
+            .body(
+                    ErrorDto.builder()
+                            .createdAt(Instant.now())
+                            .message(
+                                    messageSource.getMessage(
+                                            "exception.bad-password", null, RequestContextUtils.getLocale(request)))
+                            .build());
   }
 
   @ExceptionHandler(Exception.class)

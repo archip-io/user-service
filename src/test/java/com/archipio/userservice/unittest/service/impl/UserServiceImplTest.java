@@ -10,6 +10,8 @@ import static org.mockito.quality.Strictness.LENIENT;
 import com.archipio.userservice.dto.CredentialsInputDto;
 import com.archipio.userservice.dto.CredentialsOutputDto;
 import com.archipio.userservice.dto.ResetPasswordDto;
+import com.archipio.userservice.dto.ValidatePasswordDto;
+import com.archipio.userservice.exception.BadPasswordException;
 import com.archipio.userservice.exception.EmailAlreadyExistsException;
 import com.archipio.userservice.exception.RoleNotFoundException;
 import com.archipio.userservice.exception.UserNotFoundException;
@@ -259,9 +261,63 @@ class UserServiceImplTest {
 
     // Do
     assertThatExceptionOfType(UserNotFoundException.class)
-        .isThrownBy(() -> userService.resetPassword(resetPasswordDto));
+            .isThrownBy(() -> userService.resetPassword(resetPasswordDto));
 
     // Check
     verify(userRepository, times(1)).findByLogin(login);
+  }
+
+  @Test
+  public void validatePassword_userExistsAndPasswordIsCorrect_nothing() {
+    // Prepare
+    final var login = "login";
+    final var password = "password";
+    final var user = User.builder().password(password).build();
+    final var validatePasswordDto = ValidatePasswordDto.builder().login(login).password(password).build();
+    when(userRepository.findByLogin(login)).thenReturn(Optional.of(user));
+    when(passwordEncoder.matches(password, user.getPassword())).thenReturn(true);
+
+    // Do
+    userService.validatePassword(validatePasswordDto);
+
+    // Check
+    verify(userRepository, times(1)).findByLogin(login);
+    verify(passwordEncoder, times(1)).matches(password, user.getPassword());
+  }
+
+  @Test
+  public void validatePassword_userNotFound_thrownUserNotFoundException() {
+    // Prepare
+    final var login = "login";
+    final var password = "password";
+    final var user = User.builder().build();
+    final var validatePasswordDto = ValidatePasswordDto.builder().login(login).password(password).build();
+    when(userRepository.findByLogin(login)).thenReturn(Optional.empty());
+
+    // Do
+    assertThatExceptionOfType(UserNotFoundException.class)
+            .isThrownBy(() -> userService.validatePassword(validatePasswordDto));
+
+    // Check
+    verify(userRepository, times(1)).findByLogin(login);
+  }
+
+  @Test
+  public void validatePassword_userExistsAndPasswordIsIncorrect_thrownBadPasswordException() {
+    // Prepare
+    final var login = "login";
+    final var password = "password";
+    final var user = User.builder().password(password).build();
+    final var validatePasswordDto = ValidatePasswordDto.builder().login(login).password(password).build();
+    when(userRepository.findByLogin(login)).thenReturn(Optional.of(user));
+    when(passwordEncoder.matches(password, user.getPassword())).thenReturn(false);
+
+    // Do
+    assertThatExceptionOfType(BadPasswordException.class)
+            .isThrownBy(() -> userService.validatePassword(validatePasswordDto));
+
+    // Check
+    verify(userRepository, times(1)).findByLogin(login);
+    verify(passwordEncoder, times(1)).matches(password, user.getPassword());
   }
 }
