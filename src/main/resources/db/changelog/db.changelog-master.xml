@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="DDL-000" author="ptrvsrg">
+        <sqlFile path="db/changelog/DDL/000-create-authority-table.sql" splitStatements="false"/>
+    </changeSet>
+    <changeSet id="DDL-001" author="ptrvsrg">
+        <sqlFile path="db/changelog/DDL/001-create-role-table.sql" splitStatements="false"/>
+    </changeSet>
+    <changeSet id="DDL-002" author="ptrvsrg">
+        <sqlFile path="db/changelog/DDL/002-create-roles-authorities-table.sql" splitStatements="false"/>
+    </changeSet>
+    <changeSet id="DDL-003" author="ptrvsrg">
+        <sqlFile path="db/changelog/DDL/003-create-user-table.sql" splitStatements="false"/>
+    </changeSet>
+    <changeSet id="DML-000" author="ptrvsrg">
+        <sqlFile path="db/changelog/DML/000-add-roles.sql" splitStatements="false"/>
+    </changeSet>
+    <changeSet id="DML-001" author="ptrvsrg">
+        <sqlFile path="db/changelog/DML/001-add-authorities.sql" splitStatements="false"/>
+    </changeSet>
+    <changeSet id="DML-002" author="ptrvsrg">
+        <sqlFile path="db/changelog/DML/002-add-roles-authorities.sql" splitStatements="false"/>
+    </changeSet>
+</databaseChangeLog>
