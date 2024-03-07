@@ -7,5 +7,6 @@ import lombok.NoArgsConstructor;
 public class ApiUtils {
 
   public static final String SYS_V0_PREFIX = "/sys/v0/users";
-  public static final String CREATE_USER_SUFFIX = "";
+  public static final String SAVE_CREDENTIALS_SUFFIX = "";
+  public static final String FIND_CREDENTIALS_SUFFIX = "";
 }

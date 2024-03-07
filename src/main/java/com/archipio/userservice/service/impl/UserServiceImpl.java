@@ -1,8 +1,10 @@
 package com.archipio.userservice.service.impl;
 
-import com.archipio.userservice.dto.UserDto;
+import com.archipio.userservice.dto.CredentialsInputDto;
+import com.archipio.userservice.dto.CredentialsOutputDto;
 import com.archipio.userservice.exception.EmailAlreadyExistsException;
 import com.archipio.userservice.exception.RoleNotFoundException;
+import com.archipio.userservice.exception.UserNotFoundException;
 import com.archipio.userservice.exception.UsernameAlreadyExistsException;
 import com.archipio.userservice.mapper.UserMapper;
 import com.archipio.userservice.persistence.entity.Role;
@@ -27,20 +29,26 @@ public class UserServiceImpl implements UserService {
   private final BCryptPasswordEncoder passwordEncoder;
 
   @Override
-  public void createUser(UserDto userDto) {
-    if (userRepository.existsByUsername(userDto.getUsername())) {
+  public void saveCredentials(CredentialsInputDto credentialsInputDto) {
+    if (userRepository.existsByUsername(credentialsInputDto.getUsername())) {
       throw new UsernameAlreadyExistsException();
     }
-    if (userRepository.existsByEmail(userDto.getEmail())) {
+    if (userRepository.existsByEmail(credentialsInputDto.getEmail())) {
       throw new EmailAlreadyExistsException();
     }
 
-    userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
-    var user = userMapper.toEntity(userDto);
+    credentialsInputDto.setPassword(passwordEncoder.encode(credentialsInputDto.getPassword()));
+    var user = userMapper.toEntity(credentialsInputDto);
     user.setRole(getDefaultRole());
     userRepository.save(user);
 
     // TODO: Создать событие создания пользователя в Kafka
+  }
+
+  @Override
+  public CredentialsOutputDto findByLogin(String login) {
+    var user = userRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
+    return userMapper.toDto(user);
   }
 
   private Role getDefaultRole() {

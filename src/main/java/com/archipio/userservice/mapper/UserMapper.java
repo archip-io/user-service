@@ -1,6 +1,7 @@
 package com.archipio.userservice.mapper;
 
-import com.archipio.userservice.dto.UserDto;
+import com.archipio.userservice.dto.CredentialsInputDto;
+import com.archipio.userservice.dto.CredentialsOutputDto;
 import com.archipio.userservice.persistence.entity.User;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -14,10 +15,10 @@ import org.mapstruct.ReportingPolicy;
     componentModel = MappingConstants.ComponentModel.SPRING)
 public interface UserMapper {
 
-  User toEntity(UserDto userDto);
+  User toEntity(CredentialsInputDto credentialsInputDto);
 
-  UserDto toDto(User user);
+  CredentialsOutputDto toDto(User user);
 
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-  User partialUpdate(UserDto userDto, @MappingTarget User user);
+  User partialUpdate(CredentialsInputDto credentialsInputDto, @MappingTarget User user);
 }
