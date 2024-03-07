@@ -21,3 +21,8 @@ spring:
       host: localhost
       port: 16379
       password: password
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+  api-docs:
+    path: /api-docs
