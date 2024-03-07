@@ -118,4 +118,34 @@ class UserRepositoryTest {
     // Check
     assertThat(actual.isPresent()).isFalse();
   }
+
+  @Test
+  void findByUsernameAndEmail_userExists_optionalUser() {
+    // Prepare
+    final var username = "username";
+    final var email = "email";
+    final var password = "password";
+    var user = User.builder().username(username).email(email).password(password).build();
+    entityManager.persist(user);
+
+    // Do
+    var actual = userRepository.findByUsernameAndEmail(username, email);
+
+    // Check
+    assertThat(actual.isPresent()).isTrue();
+    assertThat(actual.get()).isEqualTo(user);
+  }
+
+  @Test
+  void findByUsernameAndEmail_userNotExists_emptyOptional() {
+    // Prepare
+    final var username = "username";
+    final var email = "email";
+
+    // Do
+    var actual = userRepository.findByUsernameAndEmail(username, email);
+
+    // Check
+    assertThat(actual.isPresent()).isFalse();
+  }
 }

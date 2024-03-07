@@ -44,36 +44,6 @@ class UserServiceImplTest {
   @InjectMocks private UserServiceImpl userService;
 
   @Test
-  @Order(1)
-  public void saveCredentials_notFoundRole_thrownRoleNotFoundException() {
-    // Prepare
-    final var username = "user";
-    final var email = "email";
-    final var password = "password";
-    final var roleId = 0;
-    final var roleName = "USER";
-    final var userDto =
-            CredentialsInputDto.builder().username(username).email(email).password(password).build();
-    final var user = User.builder().username(username).email(email).password(password).build();
-    when(userRepository.existsByUsername(username)).thenReturn(false);
-    when(userRepository.existsByEmail(email)).thenReturn(false);
-    when(passwordEncoder.encode(password)).thenReturn(password);
-    when(userMapper.toEntity(userDto)).thenReturn(user);
-    when(roleRepository.findByName(roleName)).thenReturn(Optional.empty());
-
-    // Do
-    assertThatExceptionOfType(RoleNotFoundException.class)
-            .isThrownBy(() -> userService.saveCredentials(userDto));
-
-    // Check
-    verify(userRepository, times(1)).existsByUsername(username);
-    verify(userRepository, times(1)).existsByEmail(email);
-    verify(passwordEncoder, times(1)).encode(password);
-    verify(userMapper, times(1)).toEntity(userDto);
-    verify(roleRepository, times(1)).findByName(roleName);
-  }
-
-  @Test
   @Order(2)
   public void saveCredentials_uniqueUser_nothing() {
     // Prepare
@@ -156,6 +126,36 @@ class UserServiceImplTest {
     // Check
     verify(userRepository, times(1)).existsByUsername(username);
     verify(userRepository, times(1)).existsByEmail(email);
+  }
+
+  @Test
+  @Order(1)
+  public void saveCredentials_notFoundRole_thrownRoleNotFoundException() {
+    // Prepare
+    final var username = "user";
+    final var email = "email";
+    final var password = "password";
+    final var roleId = 0;
+    final var roleName = "USER";
+    final var userDto =
+            CredentialsInputDto.builder().username(username).email(email).password(password).build();
+    final var user = User.builder().username(username).email(email).password(password).build();
+    when(userRepository.existsByUsername(username)).thenReturn(false);
+    when(userRepository.existsByEmail(email)).thenReturn(false);
+    when(passwordEncoder.encode(password)).thenReturn(password);
+    when(userMapper.toEntity(userDto)).thenReturn(user);
+    when(roleRepository.findByName(roleName)).thenReturn(Optional.empty());
+
+    // Do
+    assertThatExceptionOfType(RoleNotFoundException.class)
+            .isThrownBy(() -> userService.saveCredentials(userDto));
+
+    // Check
+    verify(userRepository, times(1)).existsByUsername(username);
+    verify(userRepository, times(1)).existsByEmail(email);
+    verify(passwordEncoder, times(1)).encode(password);
+    verify(userMapper, times(1)).toEntity(userDto);
+    verify(roleRepository, times(1)).findByName(roleName);
   }
 
   @Test

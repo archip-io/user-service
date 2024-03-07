@@ -8,4 +8,6 @@ public interface UserService {
   void saveCredentials(CredentialsInputDto credentialsInputDto);
 
   CredentialsOutputDto findByLogin(String login);
+
+  CredentialsOutputDto findByUsernameAndEmail(String username, String email);
 }

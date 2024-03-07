@@ -51,6 +51,12 @@ public class UserServiceImpl implements UserService {
     return userMapper.toDto(user);
   }
 
+  @Override
+  public CredentialsOutputDto findByUsernameAndEmail(String username, String email) {
+    var user = userRepository.findByUsernameAndEmail(username, email).orElseThrow(UserNotFoundException::new);
+    return userMapper.toDto(user);
+  }
+
   private Role getDefaultRole() {
     if (defaultRole == null) {
       defaultRole =
