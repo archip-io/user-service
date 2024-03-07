@@ -24,7 +24,7 @@ import org.hibernate.validator.constraints.Length;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserDto {
+public class CredentialsInputDto {
 
   @NotNull(message = "{validation.username.not-null}")
   @Length(
