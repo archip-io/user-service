@@ -9,6 +9,7 @@ import static org.mockito.quality.Strictness.LENIENT;
 
 import com.archipio.userservice.dto.CredentialsInputDto;
 import com.archipio.userservice.dto.CredentialsOutputDto;
+import com.archipio.userservice.dto.ResetPasswordDto;
 import com.archipio.userservice.exception.EmailAlreadyExistsException;
 import com.archipio.userservice.exception.RoleNotFoundException;
 import com.archipio.userservice.exception.UserNotFoundException;
@@ -20,7 +21,6 @@ import com.archipio.userservice.persistence.repository.RoleRepository;
 import com.archipio.userservice.persistence.repository.UserRepository;
 import com.archipio.userservice.service.impl.UserServiceImpl;
 import java.util.Optional;
-
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -138,7 +138,7 @@ class UserServiceImplTest {
     final var roleId = 0;
     final var roleName = "USER";
     final var userDto =
-            CredentialsInputDto.builder().username(username).email(email).password(password).build();
+        CredentialsInputDto.builder().username(username).email(email).password(password).build();
     final var user = User.builder().username(username).email(email).password(password).build();
     when(userRepository.existsByUsername(username)).thenReturn(false);
     when(userRepository.existsByEmail(email)).thenReturn(false);
@@ -148,7 +148,7 @@ class UserServiceImplTest {
 
     // Do
     assertThatExceptionOfType(RoleNotFoundException.class)
-            .isThrownBy(() -> userService.saveCredentials(userDto));
+        .isThrownBy(() -> userService.saveCredentials(userDto));
 
     // Check
     verify(userRepository, times(1)).existsByUsername(username);
@@ -185,7 +185,81 @@ class UserServiceImplTest {
     when(userRepository.findByLogin(login)).thenReturn(Optional.empty());
 
     // Do
-    assertThatExceptionOfType(UserNotFoundException.class).isThrownBy(() -> userService.findByLogin(login));
+    assertThatExceptionOfType(UserNotFoundException.class)
+        .isThrownBy(() -> userService.findByLogin(login));
+
+    // Check
+    verify(userRepository, times(1)).findByLogin(login);
+  }
+
+  @Test
+  public void findByUsernameAndEmail_userExists_credentialsOutputDto() {
+    // Prepare
+    final var username = "user";
+    final var email = "email";
+    final var user = User.builder().build();
+    final var credentialsOutputDto = CredentialsOutputDto.builder().build();
+    when(userRepository.findByUsernameAndEmail(username, email)).thenReturn(Optional.of(user));
+    when(userMapper.toDto(user)).thenReturn(credentialsOutputDto);
+
+    // Do
+    var actualCredentialsOutputDto = userService.findByUsernameAndEmail(username, email);
+
+    // Check
+    verify(userRepository, times(1)).findByUsernameAndEmail(username, email);
+    verify(userMapper, times(1)).toDto(user);
+
+    assertThat(actualCredentialsOutputDto).isEqualTo(credentialsOutputDto);
+  }
+
+  @Test
+  public void findByUsernameAndEmail_userNotFound_thrownUserNotFoundException() {
+    // Prepare
+    final var username = "user";
+    final var email = "email";
+    final var user = User.builder().build();
+    when(userRepository.findByUsernameAndEmail(username, email)).thenReturn(Optional.empty());
+
+    // Do
+    assertThatExceptionOfType(UserNotFoundException.class)
+        .isThrownBy(() -> userService.findByUsernameAndEmail(username, email));
+
+    // Check
+    verify(userRepository, times(1)).findByUsernameAndEmail(username, email);
+  }
+
+  @Test
+  public void resetPassword_userExists_nothing() {
+    // Prepare
+    final var login = "login";
+    final var password = "password";
+    final var user = User.builder().build();
+    final var resetPasswordDto = ResetPasswordDto.builder().login(login).password(password).build();
+    when(userRepository.findByLogin(login)).thenReturn(Optional.of(user));
+    when(passwordEncoder.encode(password)).thenReturn(password);
+    when(userRepository.save(user)).thenReturn(user);
+
+    // Do
+    userService.resetPassword(resetPasswordDto);
+
+    // Check
+    verify(userRepository, times(1)).findByLogin(login);
+    verify(passwordEncoder, times(1)).encode(password);
+    verify(userRepository, times(1)).save(user);
+  }
+
+  @Test
+  public void resetPassword_userNotFound_thrownUserNotFoundException() {
+    // Prepare
+    final var login = "login";
+    final var password = "password";
+    final var user = User.builder().build();
+    final var resetPasswordDto = ResetPasswordDto.builder().login(login).password(password).build();
+    when(userRepository.findByLogin(login)).thenReturn(Optional.empty());
+
+    // Do
+    assertThatExceptionOfType(UserNotFoundException.class)
+        .isThrownBy(() -> userService.resetPassword(resetPasswordDto));
 
     // Check
     verify(userRepository, times(1)).findByLogin(login);

@@ -1,6 +1,7 @@
 package com.archipio.userservice.controller.sys.v0;
 
 import static com.archipio.userservice.util.ApiUtils.FIND_CREDENTIALS_SUFFIX;
+import static com.archipio.userservice.util.ApiUtils.RESET_PASSWORD_SUFFIX;
 import static com.archipio.userservice.util.ApiUtils.SAVE_CREDENTIALS_SUFFIX;
 import static com.archipio.userservice.util.ApiUtils.SYS_V0_PREFIX;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -8,6 +9,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 import com.archipio.userservice.dto.CredentialsInputDto;
 import com.archipio.userservice.dto.CredentialsOutputDto;
+import com.archipio.userservice.dto.ResetPasswordDto;
 import com.archipio.userservice.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -45,5 +47,11 @@ public class UserController {
       @RequestParam("username") String username, @RequestParam("email") String email) {
     var credentialsOutputDto = userService.findByUsernameAndEmail(username, email);
     return ResponseEntity.status(OK).body(credentialsOutputDto);
+  }
+
+  @PostMapping(RESET_PASSWORD_SUFFIX)
+  public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordDto resetPasswordDto) {
+    userService.resetPassword(resetPasswordDto);
+    return ResponseEntity.status(OK).build();
   }
 }

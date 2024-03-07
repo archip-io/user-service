@@ -2,6 +2,7 @@ package com.archipio.userservice.service;
 
 import com.archipio.userservice.dto.CredentialsInputDto;
 import com.archipio.userservice.dto.CredentialsOutputDto;
+import com.archipio.userservice.dto.ResetPasswordDto;
 
 public interface UserService {
 
@@ -10,4 +11,6 @@ public interface UserService {
   CredentialsOutputDto findByLogin(String login);
 
   CredentialsOutputDto findByUsernameAndEmail(String username, String email);
+
+  void resetPassword(ResetPasswordDto resetPasswordDto);
 }
