@@ -17,4 +17,6 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
 
   @Query("SELECT u FROM User u WHERE u.username = :login OR u.email = :login")
   Optional<User> findByLogin(@Param("login") String login);
+
+  Optional<User> findByUsernameAndEmail(String username, String email);
 }
