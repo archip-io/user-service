@@ -3,6 +3,8 @@ package com.archipio.userservice.service.impl;
 import com.archipio.userservice.dto.CredentialsInputDto;
 import com.archipio.userservice.dto.CredentialsOutputDto;
 import com.archipio.userservice.dto.ResetPasswordDto;
+import com.archipio.userservice.dto.ValidatePasswordDto;
+import com.archipio.userservice.exception.BadPasswordException;
 import com.archipio.userservice.exception.EmailAlreadyExistsException;
 import com.archipio.userservice.exception.RoleNotFoundException;
 import com.archipio.userservice.exception.UserNotFoundException;
@@ -66,6 +68,17 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(UserNotFoundException::new);
     user.setPassword(passwordEncoder.encode(resetPasswordDto.getPassword()));
     userRepository.save(user);
+  }
+
+  @Override
+  public void validatePassword(ValidatePasswordDto validatePasswordDto) {
+    var user =
+            userRepository
+                    .findByLogin(validatePasswordDto.getLogin())
+                    .orElseThrow(UserNotFoundException::new);
+    if (!passwordEncoder.matches(validatePasswordDto.getPassword(), user.getPassword())) {
+      throw new BadPasswordException();
+    }
   }
 
   private Role getDefaultRole() {

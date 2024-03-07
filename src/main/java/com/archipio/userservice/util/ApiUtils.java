@@ -10,4 +10,5 @@ public class ApiUtils {
   public static final String SAVE_CREDENTIALS_SUFFIX = "";
   public static final String FIND_CREDENTIALS_SUFFIX = "";
   public static final String RESET_PASSWORD_SUFFIX = "/reset-password";
+  public static final String VALIDATE_PASSWORD_SUFFIX = "/validate-password";
 }
