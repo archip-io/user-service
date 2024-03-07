@@ -4,9 +4,11 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import com.archipio.userservice.dto.ErrorDto;
 import com.archipio.userservice.exception.EmailAlreadyExistsException;
+import com.archipio.userservice.exception.UserNotFoundException;
 import com.archipio.userservice.exception.UsernameAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
@@ -137,6 +139,21 @@ public class ExceptionCatcher {
                             .message(
                                     messageSource.getMessage(
                                             "exception.email-already-exists",
+                                            null,
+                                            RequestContextUtils.getLocale(request)))
+                            .build());
+  }
+
+  @ExceptionHandler(UserNotFoundException.class)
+  public ResponseEntity<ErrorDto> handleUserNotFoundException(
+          HttpServletRequest request, UserNotFoundException e) {
+    return ResponseEntity.status(NOT_FOUND)
+            .body(
+                    ErrorDto.builder()
+                            .createdAt(Instant.now())
+                            .message(
+                                    messageSource.getMessage(
+                                            "exception.user-not-found",
                                             null,
                                             RequestContextUtils.getLocale(request)))
                             .build());

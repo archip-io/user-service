@@ -20,7 +20,6 @@ import com.archipio.userservice.persistence.repository.RoleRepository;
 import com.archipio.userservice.persistence.repository.UserRepository;
 import com.archipio.userservice.service.impl.UserServiceImpl;
 import java.util.Optional;
-
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -42,36 +41,6 @@ class UserServiceImplTest {
   @Mock private UserMapper userMapper;
   @Mock private BCryptPasswordEncoder passwordEncoder;
   @InjectMocks private UserServiceImpl userService;
-
-  @Test
-  @Order(1)
-  public void saveCredentials_notFoundRole_thrownRoleNotFoundException() {
-    // Prepare
-    final var username = "user";
-    final var email = "email";
-    final var password = "password";
-    final var roleId = 0;
-    final var roleName = "USER";
-    final var userDto =
-            CredentialsInputDto.builder().username(username).email(email).password(password).build();
-    final var user = User.builder().username(username).email(email).password(password).build();
-    when(userRepository.existsByUsername(username)).thenReturn(false);
-    when(userRepository.existsByEmail(email)).thenReturn(false);
-    when(passwordEncoder.encode(password)).thenReturn(password);
-    when(userMapper.toEntity(userDto)).thenReturn(user);
-    when(roleRepository.findByName(roleName)).thenReturn(Optional.empty());
-
-    // Do
-    assertThatExceptionOfType(RoleNotFoundException.class)
-            .isThrownBy(() -> userService.saveCredentials(userDto));
-
-    // Check
-    verify(userRepository, times(1)).existsByUsername(username);
-    verify(userRepository, times(1)).existsByEmail(email);
-    verify(passwordEncoder, times(1)).encode(password);
-    verify(userMapper, times(1)).toEntity(userDto);
-    verify(roleRepository, times(1)).findByName(roleName);
-  }
 
   @Test
   @Order(2)
@@ -159,6 +128,35 @@ class UserServiceImplTest {
   }
 
   @Test
+  @Order(1)
+  public void saveCredentials_notFoundRole_thrownRoleNotFoundException() {
+    // Prepare
+    final var username = "user";
+    final var email = "email";
+    final var password = "password";
+    final var roleName = "USER";
+    final var userDto =
+        CredentialsInputDto.builder().username(username).email(email).password(password).build();
+    final var user = User.builder().username(username).email(email).password(password).build();
+    when(userRepository.existsByUsername(username)).thenReturn(false);
+    when(userRepository.existsByEmail(email)).thenReturn(false);
+    when(passwordEncoder.encode(password)).thenReturn(password);
+    when(userMapper.toEntity(userDto)).thenReturn(user);
+    when(roleRepository.findByName(roleName)).thenReturn(Optional.empty());
+
+    // Do
+    assertThatExceptionOfType(RoleNotFoundException.class)
+        .isThrownBy(() -> userService.saveCredentials(userDto));
+
+    // Check
+    verify(userRepository, times(1)).existsByUsername(username);
+    verify(userRepository, times(1)).existsByEmail(email);
+    verify(passwordEncoder, times(1)).encode(password);
+    verify(userMapper, times(1)).toEntity(userDto);
+    verify(roleRepository, times(1)).findByName(roleName);
+  }
+
+  @Test
   public void findByLogin_userExists_credentialsOutputDto() {
     // Prepare
     final var login = "login";
@@ -181,13 +179,48 @@ class UserServiceImplTest {
   public void findByLogin_userNotFound_thrownUserNotFoundException() {
     // Prepare
     final var login = "login";
-    final var user = User.builder().build();
     when(userRepository.findByLogin(login)).thenReturn(Optional.empty());
 
     // Do
-    assertThatExceptionOfType(UserNotFoundException.class).isThrownBy(() -> userService.findByLogin(login));
+    assertThatExceptionOfType(UserNotFoundException.class)
+        .isThrownBy(() -> userService.findByLogin(login));
 
     // Check
     verify(userRepository, times(1)).findByLogin(login);
+  }
+
+  @Test
+  public void findByUsernameAndEmail_userExists_credentialsOutputDto() {
+    // Prepare
+    final var username = "username";
+    final var email = "email";
+    final var user = User.builder().build();
+    final var credentialsOutputDto = CredentialsOutputDto.builder().build();
+    when(userRepository.findByUsernameAndEmail(username, email)).thenReturn(Optional.of(user));
+    when(userMapper.toDto(user)).thenReturn(credentialsOutputDto);
+
+    // Do
+    var actualCredentialsOutputDto = userService.findByUsernameAndEmail(username, email);
+
+    // Check
+    verify(userRepository, times(1)).findByUsernameAndEmail(username, email);
+    verify(userMapper, times(1)).toDto(user);
+
+    assertThat(actualCredentialsOutputDto).isEqualTo(credentialsOutputDto);
+  }
+
+  @Test
+  public void findByUsernameAndEmail_userNotFound_thrownUserNotFoundException() {
+    // Prepare
+    final var username = "username";
+    final var email = "email";
+    when(userRepository.findByUsernameAndEmail(username, email)).thenReturn(Optional.empty());
+
+    // Do
+    assertThatExceptionOfType(UserNotFoundException.class)
+        .isThrownBy(() -> userService.findByUsernameAndEmail(username, email));
+
+    // Check
+    verify(userRepository, times(1)).findByUsernameAndEmail(username, email);
   }
 }

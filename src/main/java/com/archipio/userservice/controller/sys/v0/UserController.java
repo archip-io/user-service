@@ -35,8 +35,16 @@ public class UserController {
 
   @GetMapping(FIND_CREDENTIALS_SUFFIX)
   public ResponseEntity<CredentialsOutputDto> findCredentialsByLogin(
-      @RequestParam("login") String login) {
+          @RequestParam("login") String login) {
     var credentialsOutputDto = userService.findByLogin(login);
+    return ResponseEntity.status(OK).body(credentialsOutputDto);
+  }
+
+  @GetMapping(FIND_CREDENTIALS_SUFFIX)
+  public ResponseEntity<CredentialsOutputDto> findCredentialsByLogin(
+          @RequestParam("username") String username,
+          @RequestParam("email") String email) {
+    var credentialsOutputDto = userService.findByUsernameAndEmail(username, email);
     return ResponseEntity.status(OK).body(credentialsOutputDto);
   }
 }
