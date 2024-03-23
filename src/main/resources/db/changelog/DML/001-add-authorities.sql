@@ -7,12 +7,14 @@ WITH user_authorities AS (SELECT *
                                        ('UPDATE_PROJECT', 'Изменение проекта'),
                                        ('DELETE_PROJECT', 'Удаление проекта'),
                                        ('ADD_FAVORITE_PROJECT', 'Добавление проекта в Избранное'),
-                                       ('DELETE_FAVORITE_PROJECT',
-                                        'Удаление проекта из Избранного')) AS user_authorities(name, description)),
+                                       ('DELETE_FAVORITE_PROJECT', 'Удаление проекта из Избранного'))
+                                   AS user_authorities(name, description)),
      admin_authorities AS (SELECT *
-                           FROM (VALUES ('DELETE_USER_ACCOUNT', 'Удаление аккаунта пользователя'),
-                                        ('DELETE_USER_PROJECT',
-                                         'Удаление проекта пользователя')) AS admin_authorities(name, description))
+                           FROM (VALUES ('BAN_USER', 'Блокирование аккаунта пользователя'),
+                                        ('UNBAN_USER', 'Разблокирование аккаунта пользователя'),
+                                        ('DELETE_USER', 'Удаление аккаунта пользователя'),
+                                        ('DELETE_PROJECT', 'Удаление проекта пользователя'))
+                                    AS admin_authorities(name, description))
 INSERT
 INTO authorities (name, description, create_at, update_at)
 SELECT name, description, NOW(), NOW()
