@@ -70,9 +70,8 @@ public class UserController {
 
   @PutMapping(RESET_PASSWORD_SUFFIX)
   @Operation(
-          summary = "Сброс пароля",
-          description =
-                  "Ищет учетные данные по логину и в случае успеха изменяет пароль на новый")
+      summary = "Сброс пароля",
+      description = "Ищет учетные данные по логину и в случае успеха изменяет пароль на новый")
   public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordDto resetPasswordDto) {
     userService.resetPassword(resetPasswordDto);
     return ResponseEntity.status(OK).build();
@@ -80,9 +79,8 @@ public class UserController {
 
   @PostMapping(VALIDATE_PASSWORD_SUFFIX)
   @Operation(
-          summary = "Проверка пароля",
-          description =
-                  "Ищет учетные данные по логину и в случае успеха проверяет пароли")
+      summary = "Проверка пароля",
+      description = "Ищет учетные данные по логину и в случае успеха проверяет пароли")
   public ResponseEntity<Void> validatePassword(
       @Valid @RequestBody ValidatePasswordDto validatePasswordDto) {
     userService.validatePassword(validatePasswordDto);

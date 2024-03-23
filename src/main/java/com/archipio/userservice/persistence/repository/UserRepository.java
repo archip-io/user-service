@@ -1,7 +1,6 @@
 package com.archipio.userservice.persistence.repository;
 
 import com.archipio.userservice.persistence.entity.User;
-
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;

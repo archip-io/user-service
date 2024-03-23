@@ -56,8 +56,16 @@ class UserServiceImplTest {
     final var roleName = "USER";
     final var userDto =
         CredentialsInputDto.builder().username(username).email(email).password(password).build();
-    final var user = User.builder().username(username).email(email).password(password).build();
-    final var role = Role.builder().id(roleId).name(roleName).build();
+
+    final var user = new User();
+    user.setUsername(username);
+    user.setEmail(email);
+    user.setPassword(password);
+
+    final var role = new Role();
+    role.setId(roleId);
+    role.setName(roleName);
+
     when(userRepository.existsByUsername(username)).thenReturn(false);
     when(userRepository.existsByEmail(email)).thenReturn(false);
     when(passwordEncoder.encode(password)).thenReturn(password);
@@ -137,11 +145,15 @@ class UserServiceImplTest {
     final var username = "user";
     final var email = "email";
     final var password = "password";
-    final var roleId = 0;
     final var roleName = "USER";
     final var userDto =
         CredentialsInputDto.builder().username(username).email(email).password(password).build();
-    final var user = User.builder().username(username).email(email).password(password).build();
+
+    final var user = new User();
+    user.setUsername(username);
+    user.setEmail(email);
+    user.setPassword(password);
+
     when(userRepository.existsByUsername(username)).thenReturn(false);
     when(userRepository.existsByEmail(email)).thenReturn(false);
     when(passwordEncoder.encode(password)).thenReturn(password);
@@ -164,7 +176,7 @@ class UserServiceImplTest {
   public void findByLogin_userExists_credentialsOutputDto() {
     // Prepare
     final var login = "login";
-    final var user = User.builder().build();
+    final var user = new User();
     final var credentialsOutputDto = CredentialsOutputDto.builder().build();
     when(userRepository.findByLogin(login)).thenReturn(Optional.of(user));
     when(userMapper.toDto(user)).thenReturn(credentialsOutputDto);
@@ -183,7 +195,6 @@ class UserServiceImplTest {
   public void findByLogin_userNotFound_thrownUserNotFoundException() {
     // Prepare
     final var login = "login";
-    final var user = User.builder().build();
     when(userRepository.findByLogin(login)).thenReturn(Optional.empty());
 
     // Do
@@ -199,7 +210,7 @@ class UserServiceImplTest {
     // Prepare
     final var username = "user";
     final var email = "email";
-    final var user = User.builder().build();
+    final var user = new User();
     final var credentialsOutputDto = CredentialsOutputDto.builder().build();
     when(userRepository.findByUsernameAndEmail(username, email)).thenReturn(Optional.of(user));
     when(userMapper.toDto(user)).thenReturn(credentialsOutputDto);
@@ -219,7 +230,6 @@ class UserServiceImplTest {
     // Prepare
     final var username = "user";
     final var email = "email";
-    final var user = User.builder().build();
     when(userRepository.findByUsernameAndEmail(username, email)).thenReturn(Optional.empty());
 
     // Do
@@ -235,7 +245,7 @@ class UserServiceImplTest {
     // Prepare
     final var login = "login";
     final var password = "password";
-    final var user = User.builder().build();
+    final var user = new User();
     final var resetPasswordDto = ResetPasswordDto.builder().login(login).password(password).build();
     when(userRepository.findByLogin(login)).thenReturn(Optional.of(user));
     when(passwordEncoder.encode(password)).thenReturn(password);
@@ -255,13 +265,12 @@ class UserServiceImplTest {
     // Prepare
     final var login = "login";
     final var password = "password";
-    final var user = User.builder().build();
     final var resetPasswordDto = ResetPasswordDto.builder().login(login).password(password).build();
     when(userRepository.findByLogin(login)).thenReturn(Optional.empty());
 
     // Do
     assertThatExceptionOfType(UserNotFoundException.class)
-            .isThrownBy(() -> userService.resetPassword(resetPasswordDto));
+        .isThrownBy(() -> userService.resetPassword(resetPasswordDto));
 
     // Check
     verify(userRepository, times(1)).findByLogin(login);
@@ -272,8 +281,12 @@ class UserServiceImplTest {
     // Prepare
     final var login = "login";
     final var password = "password";
-    final var user = User.builder().password(password).build();
-    final var validatePasswordDto = ValidatePasswordDto.builder().login(login).password(password).build();
+
+    final var user = new User();
+    user.setPassword(password);
+
+    final var validatePasswordDto =
+        ValidatePasswordDto.builder().login(login).password(password).build();
     when(userRepository.findByLogin(login)).thenReturn(Optional.of(user));
     when(passwordEncoder.matches(password, user.getPassword())).thenReturn(true);
 
@@ -290,13 +303,13 @@ class UserServiceImplTest {
     // Prepare
     final var login = "login";
     final var password = "password";
-    final var user = User.builder().build();
-    final var validatePasswordDto = ValidatePasswordDto.builder().login(login).password(password).build();
+    final var validatePasswordDto =
+        ValidatePasswordDto.builder().login(login).password(password).build();
     when(userRepository.findByLogin(login)).thenReturn(Optional.empty());
 
     // Do
     assertThatExceptionOfType(UserNotFoundException.class)
-            .isThrownBy(() -> userService.validatePassword(validatePasswordDto));
+        .isThrownBy(() -> userService.validatePassword(validatePasswordDto));
 
     // Check
     verify(userRepository, times(1)).findByLogin(login);
@@ -307,14 +320,18 @@ class UserServiceImplTest {
     // Prepare
     final var login = "login";
     final var password = "password";
-    final var user = User.builder().password(password).build();
-    final var validatePasswordDto = ValidatePasswordDto.builder().login(login).password(password).build();
+
+    final var user = new User();
+    user.setPassword(password);
+
+    final var validatePasswordDto =
+        ValidatePasswordDto.builder().login(login).password(password).build();
     when(userRepository.findByLogin(login)).thenReturn(Optional.of(user));
     when(passwordEncoder.matches(password, user.getPassword())).thenReturn(false);
 
     // Do
     assertThatExceptionOfType(BadPasswordException.class)
-            .isThrownBy(() -> userService.validatePassword(validatePasswordDto));
+        .isThrownBy(() -> userService.validatePassword(validatePasswordDto));
 
     // Check
     verify(userRepository, times(1)).findByLogin(login);

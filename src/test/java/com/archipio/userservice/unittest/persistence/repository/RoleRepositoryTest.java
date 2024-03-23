@@ -3,7 +3,6 @@ package com.archipio.userservice.unittest.persistence.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.archipio.userservice.persistence.entity.Role;
-import com.archipio.userservice.persistence.entity.User;
 import com.archipio.userservice.persistence.repository.RoleRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +21,10 @@ class RoleRepositoryTest {
   void findByName_roleExists_optionalRole() {
     // Prepare
     final var name = "USER";
-    final var role = Role.builder()
-            .name(name).build();
+
+    final var role = new Role();
+    role.setName(name);
+
     entityManager.persist(role);
 
     // Do

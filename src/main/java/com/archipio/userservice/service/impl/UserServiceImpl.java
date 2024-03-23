@@ -56,7 +56,10 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public CredentialsOutputDto findByUsernameAndEmail(String username, String email) {
-    var user = userRepository.findByUsernameAndEmail(username, email).orElseThrow(UserNotFoundException::new);
+    var user =
+        userRepository
+            .findByUsernameAndEmail(username, email)
+            .orElseThrow(UserNotFoundException::new);
     return userMapper.toDto(user);
   }
 
@@ -73,9 +76,9 @@ public class UserServiceImpl implements UserService {
   @Override
   public void validatePassword(ValidatePasswordDto validatePasswordDto) {
     var user =
-            userRepository
-                    .findByLogin(validatePasswordDto.getLogin())
-                    .orElseThrow(UserNotFoundException::new);
+        userRepository
+            .findByLogin(validatePasswordDto.getLogin())
+            .orElseThrow(UserNotFoundException::new);
     if (!passwordEncoder.matches(validatePasswordDto.getPassword(), user.getPassword())) {
       throw new BadPasswordException();
     }

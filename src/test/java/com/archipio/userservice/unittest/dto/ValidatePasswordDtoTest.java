@@ -18,6 +18,16 @@ public class ValidatePasswordDtoTest {
 
   private Validator validator;
 
+  private static Stream<Arguments> provideInvalidValidatePasswordDto() {
+    return Stream.of(
+        Arguments.of(
+            ValidatePasswordDto.builder().login(null).password("Password_10").build(),
+            Set.of("login")),
+        Arguments.of(
+            ValidatePasswordDto.builder().login("login").password(null).build(),
+            Set.of("password")));
+  }
+
   @BeforeEach
   public void setUp() {
     try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
@@ -39,15 +49,5 @@ public class ValidatePasswordDtoTest {
     // Check
     assertThat(violations.isEmpty()).isFalse();
     assertThat(actualErrorFields).containsExactlyInAnyOrderElementsOf(expectedErrorFields);
-  }
-
-  private static Stream<Arguments> provideInvalidValidatePasswordDto() {
-    return Stream.of(
-        Arguments.of(
-            ValidatePasswordDto.builder().login(null).password("Password_10").build(),
-            Set.of("login")),
-        Arguments.of(
-            ValidatePasswordDto.builder().login("login").password(null).build(),
-            Set.of("password")));
   }
 }
