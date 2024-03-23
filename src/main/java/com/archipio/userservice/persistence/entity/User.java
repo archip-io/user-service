@@ -11,7 +11,6 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,7 +21,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "users")
 public class User {
@@ -36,6 +34,9 @@ public class User {
   private String email;
 
   private String password;
+
+  @Column(name = "is_enabled")
+  private boolean isEnabled;
 
   @ManyToOne
   @JoinColumn(name = "role_id")

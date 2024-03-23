@@ -10,10 +10,10 @@ WITH user_authorities AS (SELECT *
                                        ('DELETE_FAVORITE_PROJECT', 'Удаление проекта из Избранного'))
                                    AS user_authorities(name, description)),
      admin_authorities AS (SELECT *
-                           FROM (VALUES ('BAN_USER', 'Блокирование аккаунта пользователя'),
-                                        ('UNBAN_USER', 'Разблокирование аккаунта пользователя'),
-                                        ('DELETE_USER', 'Удаление аккаунта пользователя'),
-                                        ('DELETE_PROJECT', 'Удаление проекта пользователя'))
+                           FROM (VALUES ('BAN_ACCOUNT', 'Блокирование аккаунта пользователя'),
+                                        ('UNBAN_ACCOUNT', 'Разблокирование аккаунта пользователя'),
+                                        ('DELETE_USER_ACCOUNT', 'Удаление аккаунта пользователя'),
+                                        ('DELETE_USER_PROJECT', 'Удаление проекта пользователя'))
                                     AS admin_authorities(name, description))
 INSERT
 INTO authorities (name, description, create_at, update_at)

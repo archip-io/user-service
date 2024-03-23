@@ -18,6 +18,32 @@ public class ResetPasswordDtoTest {
 
   private Validator validator;
 
+  private static Stream<Arguments> provideInvalidResetPasswordDto() {
+    return Stream.of(
+        Arguments.of(
+            ResetPasswordDto.builder().login(null).password("Password_10").build(),
+            Set.of("login")),
+        Arguments.of(
+            ResetPasswordDto.builder().login("login").password(null).build(), Set.of("password")),
+        Arguments.of(
+            ResetPasswordDto.builder().login("login").password("Pw_1").build(), Set.of("password")),
+        Arguments.of(
+            ResetPasswordDto.builder()
+                .login("login")
+                .password("Password_10Password_10Password_10Password_10Password_10Password_10")
+                .build(),
+            Set.of("password")),
+        Arguments.of(
+            ResetPasswordDto.builder().login("login").password("password_10").build(),
+            Set.of("password")),
+        Arguments.of(
+            ResetPasswordDto.builder().login("login").password("Password10").build(),
+            Set.of("password")),
+        Arguments.of(
+            ResetPasswordDto.builder().login("login").password("Password_").build(),
+            Set.of("password")));
+  }
+
   @BeforeEach
   public void setUp() {
     try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
@@ -39,31 +65,5 @@ public class ResetPasswordDtoTest {
     // Check
     assertThat(violations.isEmpty()).isFalse();
     assertThat(actualErrorFields).containsExactlyInAnyOrderElementsOf(expectedErrorFields);
-  }
-
-  private static Stream<Arguments> provideInvalidResetPasswordDto() {
-    return Stream.of(
-            Arguments.of(
-                    ResetPasswordDto.builder().login(null).password("Password_10").build(),
-                    Set.of("login")),
-            Arguments.of(
-                    ResetPasswordDto.builder().login("login").password(null).build(), Set.of("password")),
-            Arguments.of(
-                    ResetPasswordDto.builder().login("login").password("Pw_1").build(), Set.of("password")),
-            Arguments.of(
-                    ResetPasswordDto.builder()
-                            .login("login")
-                            .password("Password_10Password_10Password_10Password_10Password_10Password_10")
-                            .build(),
-                    Set.of("password")),
-            Arguments.of(
-                    ResetPasswordDto.builder().login("login").password("password_10").build(),
-                    Set.of("password")),
-            Arguments.of(
-                    ResetPasswordDto.builder().login("login").password("Password10").build(),
-                    Set.of("password")),
-            Arguments.of(
-                    ResetPasswordDto.builder().login("login").password("Password_").build(),
-                    Set.of("password")));
   }
 }

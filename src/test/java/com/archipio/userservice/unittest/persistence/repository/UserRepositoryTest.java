@@ -23,7 +23,14 @@ class UserRepositoryTest {
     final var username = "username";
     final var email = "email";
     final var password = "password";
-    var user = User.builder().username(username).email(email).password(password).build();
+    final var isEnabled = true;
+
+    var user = new User();
+    user.setUsername(username);
+    user.setEmail(email);
+    user.setPassword(password);
+    user.setEnabled(isEnabled);
+
     entityManager.persist(user);
 
     // Do
@@ -51,7 +58,14 @@ class UserRepositoryTest {
     final var username = "username";
     final var email = "email";
     final var password = "password";
-    var user = User.builder().username(username).email(email).password(password).build();
+    final var isEnabled = true;
+
+    var user = new User();
+    user.setUsername(username);
+    user.setEmail(email);
+    user.setPassword(password);
+    user.setEnabled(isEnabled);
+
     entityManager.persist(user);
 
     // Do
@@ -79,7 +93,14 @@ class UserRepositoryTest {
     final var username = "username";
     final var email = "email";
     final var password = "password";
-    var user = User.builder().username(username).email(email).password(password).build();
+    final var isEnabled = true;
+
+    var user = new User();
+    user.setUsername(username);
+    user.setEmail(email);
+    user.setPassword(password);
+    user.setEnabled(isEnabled);
+
     entityManager.persist(user);
 
     // Do
@@ -96,7 +117,14 @@ class UserRepositoryTest {
     final var username = "username";
     final var email = "email";
     final var password = "password";
-    var user = User.builder().username(username).email(email).password(password).build();
+    final var isEnabled = true;
+
+    var user = new User();
+    user.setUsername(username);
+    user.setEmail(email);
+    user.setPassword(password);
+    user.setEnabled(isEnabled);
+
     entityManager.persist(user);
 
     // Do
@@ -125,7 +153,14 @@ class UserRepositoryTest {
     final var username = "username";
     final var email = "email";
     final var password = "password";
-    var user = User.builder().username(username).email(email).password(password).build();
+    final var isEnabled = true;
+
+    var user = new User();
+    user.setUsername(username);
+    user.setEmail(email);
+    user.setPassword(password);
+    user.setEnabled(isEnabled);
+
     entityManager.persist(user);
 
     // Do

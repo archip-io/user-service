@@ -21,8 +21,10 @@ class AuthorityRepositoryTest {
   void findByName_authorityExists_optionalAuthority() {
     // Prepare
     final var name = "DELETE_USER";
-    final var authority = Authority.builder()
-            .name(name).build();
+
+    final var authority = new Authority();
+    authority.setName(name);
+
     entityManager.persist(authority);
 
     // Do
@@ -36,7 +38,7 @@ class AuthorityRepositoryTest {
   @Test
   void findByName_authorityNotExists_emptyOptional() {
     // Prepare
-    final var name = "DELETE_USER";
+    final var name = "COOK";
 
     // Do
     var actual = authorityRepository.findByName(name);

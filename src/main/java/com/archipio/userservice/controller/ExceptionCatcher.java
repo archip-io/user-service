@@ -146,28 +146,28 @@ public class ExceptionCatcher {
 
   @ExceptionHandler(UserNotFoundException.class)
   public ResponseEntity<ErrorDto> handleUserNotFoundException(
-          HttpServletRequest request, UserNotFoundException e) {
+      HttpServletRequest request, UserNotFoundException e) {
     return ResponseEntity.status(NOT_FOUND)
-            .body(
-                    ErrorDto.builder()
-                            .createdAt(Instant.now())
-                            .message(
-                                    messageSource.getMessage(
-                                            "exception.user-not-found", null, RequestContextUtils.getLocale(request)))
-                            .build());
+        .body(
+            ErrorDto.builder()
+                .createdAt(Instant.now())
+                .message(
+                    messageSource.getMessage(
+                        "exception.user-not-found", null, RequestContextUtils.getLocale(request)))
+                .build());
   }
 
   @ExceptionHandler(BadPasswordException.class)
   public ResponseEntity<ErrorDto> handleBadPasswordException(
-          HttpServletRequest request, BadPasswordException e) {
+      HttpServletRequest request, BadPasswordException e) {
     return ResponseEntity.status(BAD_REQUEST)
-            .body(
-                    ErrorDto.builder()
-                            .createdAt(Instant.now())
-                            .message(
-                                    messageSource.getMessage(
-                                            "exception.bad-password", null, RequestContextUtils.getLocale(request)))
-                            .build());
+        .body(
+            ErrorDto.builder()
+                .createdAt(Instant.now())
+                .message(
+                    messageSource.getMessage(
+                        "exception.bad-password", null, RequestContextUtils.getLocale(request)))
+                .build());
   }
 
   @ExceptionHandler(Exception.class)
