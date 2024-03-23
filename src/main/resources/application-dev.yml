@@ -6,23 +6,23 @@ spring:
   application:
     name: user-service
   datasource:
-    url: jdbc:postgresql://localhost:15432/db
-    username: user
-    password: password
+    url: jdbc:postgresql://${ARCHIPIO_USER_SERVICE_DB_URL}/${ARCHIPIO_USER_SERVICE_DB_NAME}
+    username: ${ARCHIPIO_USER_SERVICE_DB_USER}
+    password: ${ARCHIPIO_USER_SERVICE_DB_PASSWORD}
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
-    url: jdbc:postgresql://localhost:15432/db
-    user: user
-    password: password
+    url: jdbc:postgresql://${ARCHIPIO_USER_SERVICE_DB_URL}/${ARCHIPIO_USER_SERVICE_DB_NAME}
+    user: ${ARCHIPIO_USER_SERVICE_DB_USER}
+    password: ${ARCHIPIO_USER_SERVICE_DB_PASSWORD}
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: validate
   data:
     redis:
-      host: localhost
-      port: 16379
-      password: password
+      host: ${ARCHIPIO_USER_SERVICE_CACHE_HOST}
+      port: ${ARCHIPIO_USER_SERVICE_CACHE_PORT}
+      password: ${ARCHIPIO_USER_SERVICE_CACHE_PASSWORD}
 springdoc:
   swagger-ui:
     path: /swagger-ui
