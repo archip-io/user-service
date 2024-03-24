@@ -42,6 +42,7 @@ public class UserServiceImpl implements UserService {
 
     credentialsInputDto.setPassword(passwordEncoder.encode(credentialsInputDto.getPassword()));
     var user = userMapper.toEntity(credentialsInputDto);
+    user.setIsEnabled(true);
     user.setRole(getDefaultRole());
     userRepository.save(user);
 
@@ -51,7 +52,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public CredentialsOutputDto findByLogin(String login) {
     var user = userRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
-    return userMapper.toDto(user);
+    return userMapper.toCredentialsOutput(user);
   }
 
   @Override
@@ -60,7 +61,7 @@ public class UserServiceImpl implements UserService {
         userRepository
             .findByUsernameAndEmail(username, email)
             .orElseThrow(UserNotFoundException::new);
-    return userMapper.toDto(user);
+    return userMapper.toCredentialsOutput(user);
   }
 
   @Override

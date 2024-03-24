@@ -2,6 +2,7 @@ package com.archipio.userservice.mapper;
 
 import com.archipio.userservice.dto.CredentialsInputDto;
 import com.archipio.userservice.dto.CredentialsOutputDto;
+import com.archipio.userservice.dto.ProfileDto;
 import com.archipio.userservice.persistence.entity.Authority;
 import com.archipio.userservice.persistence.entity.User;
 import java.util.Set;
@@ -26,7 +27,9 @@ public interface UserMapper {
       source = "role.authorities",
       target = "authorities",
       qualifiedByName = "mapAuthoritySetToStringSet")
-  CredentialsOutputDto toDto(User user);
+  CredentialsOutputDto toCredentialsOutput(User user);
+
+  ProfileDto toProfile(User user);
 
   @Named("mapAuthoritySetToStringSet")
   default Set<String> mapAuthoritySetToStringSet(Set<Authority> authorities) {

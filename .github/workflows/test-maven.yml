@@ -18,4 +18,7 @@ jobs:
           distribution: 'corretto'
           cache: maven
       - name: Test
-        run: mvn test
+        run: mvn -s $GITHUB_WORKSPACE/.github/workflows/settings.xml -B package --file pom.xml
+        env:
+          USER_NAME: ${{ secrets.USERNAME }}
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}

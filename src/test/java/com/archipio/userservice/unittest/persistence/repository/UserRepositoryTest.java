@@ -29,7 +29,7 @@ class UserRepositoryTest {
     user.setUsername(username);
     user.setEmail(email);
     user.setPassword(password);
-    user.setEnabled(isEnabled);
+    user.setIsEnabled(isEnabled);
 
     entityManager.persist(user);
 
@@ -64,7 +64,7 @@ class UserRepositoryTest {
     user.setUsername(username);
     user.setEmail(email);
     user.setPassword(password);
-    user.setEnabled(isEnabled);
+    user.setIsEnabled(isEnabled);
 
     entityManager.persist(user);
 
@@ -99,7 +99,7 @@ class UserRepositoryTest {
     user.setUsername(username);
     user.setEmail(email);
     user.setPassword(password);
-    user.setEnabled(isEnabled);
+    user.setIsEnabled(isEnabled);
 
     entityManager.persist(user);
 
@@ -123,7 +123,7 @@ class UserRepositoryTest {
     user.setUsername(username);
     user.setEmail(email);
     user.setPassword(password);
-    user.setEnabled(isEnabled);
+    user.setIsEnabled(isEnabled);
 
     entityManager.persist(user);
 
@@ -159,7 +159,7 @@ class UserRepositoryTest {
     user.setUsername(username);
     user.setEmail(email);
     user.setPassword(password);
-    user.setEnabled(isEnabled);
+    user.setIsEnabled(isEnabled);
 
     entityManager.persist(user);
 
@@ -179,6 +179,42 @@ class UserRepositoryTest {
 
     // Do
     var actual = userRepository.findByUsernameAndEmail(username, email);
+
+    // Check
+    assertThat(actual.isPresent()).isFalse();
+  }
+
+  @Test
+  void findByUsername_userExists_optionalUser() {
+    // Prepare
+    final var username = "username";
+    final var email = "email";
+    final var password = "password";
+    final var isEnabled = true;
+
+    var user = new User();
+    user.setUsername(username);
+    user.setEmail(email);
+    user.setPassword(password);
+    user.setIsEnabled(isEnabled);
+
+    entityManager.persist(user);
+
+    // Do
+    var actual = userRepository.findByUsername(username);
+
+    // Check
+    assertThat(actual.isPresent()).isTrue();
+    assertThat(actual.get()).isEqualTo(user);
+  }
+
+  @Test
+  void findByUsername_userNotExists_emptyOptional() {
+    // Prepare
+    final var username = "username";
+
+    // Do
+    var actual = userRepository.findByUsername(username);
 
     // Check
     assertThat(actual.isPresent()).isFalse();

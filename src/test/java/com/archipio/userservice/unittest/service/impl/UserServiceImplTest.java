@@ -179,14 +179,14 @@ class UserServiceImplTest {
     final var user = new User();
     final var credentialsOutputDto = CredentialsOutputDto.builder().build();
     when(userRepository.findByLogin(login)).thenReturn(Optional.of(user));
-    when(userMapper.toDto(user)).thenReturn(credentialsOutputDto);
+    when(userMapper.toCredentialsOutput(user)).thenReturn(credentialsOutputDto);
 
     // Do
     var actualCredentialsOutputDto = userService.findByLogin(login);
 
     // Check
     verify(userRepository, times(1)).findByLogin(login);
-    verify(userMapper, times(1)).toDto(user);
+    verify(userMapper, times(1)).toCredentialsOutput(user);
 
     assertThat(actualCredentialsOutputDto).isEqualTo(credentialsOutputDto);
   }
@@ -213,14 +213,14 @@ class UserServiceImplTest {
     final var user = new User();
     final var credentialsOutputDto = CredentialsOutputDto.builder().build();
     when(userRepository.findByUsernameAndEmail(username, email)).thenReturn(Optional.of(user));
-    when(userMapper.toDto(user)).thenReturn(credentialsOutputDto);
+    when(userMapper.toCredentialsOutput(user)).thenReturn(credentialsOutputDto);
 
     // Do
     var actualCredentialsOutputDto = userService.findByUsernameAndEmail(username, email);
 
     // Check
     verify(userRepository, times(1)).findByUsernameAndEmail(username, email);
-    verify(userMapper, times(1)).toDto(user);
+    verify(userMapper, times(1)).toCredentialsOutput(user);
 
     assertThat(actualCredentialsOutputDto).isEqualTo(credentialsOutputDto);
   }

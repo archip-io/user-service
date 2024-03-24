@@ -2,6 +2,7 @@ package com.archipio.userservice.controller;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -167,6 +169,19 @@ public class ExceptionCatcher {
                 .message(
                     messageSource.getMessage(
                         "exception.bad-password", null, RequestContextUtils.getLocale(request)))
+                .build());
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<ErrorDto> handleAccessDeniedException(
+      HttpServletRequest request, AccessDeniedException e) {
+    return ResponseEntity.status(FORBIDDEN)
+        .body(
+            ErrorDto.builder()
+                .createdAt(Instant.now())
+                .message(
+                    messageSource.getMessage(
+                        "exception.access-denied", null, RequestContextUtils.getLocale(request)))
                 .build());
   }
 

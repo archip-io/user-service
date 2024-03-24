@@ -48,6 +48,14 @@
         </profile>
     </profiles>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Archipio Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/archip-io/common-auth</url>
+        </repository>
+    </distributionManagement>
+
     <dependencies>
         <!-- WEB -->
         <dependency>
@@ -84,8 +92,13 @@
 
         <!-- Security -->
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-crypto</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.archipio</groupId>
+            <artifactId>common-auth</artifactId>
+            <version>0.0.0</version>
         </dependency>
 
         <!-- Monitoring -->

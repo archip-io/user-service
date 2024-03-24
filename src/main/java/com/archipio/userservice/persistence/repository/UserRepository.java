@@ -18,4 +18,6 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
   Optional<User> findByLogin(@Param("login") String login);
 
   Optional<User> findByUsernameAndEmail(String username, String email);
+
+  Optional<User> findByUsername(String username);
 }
