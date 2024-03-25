@@ -7,4 +7,6 @@ public interface ProfileService {
   ProfileDto getProfileByUsername(String username);
 
   void updateUsername(String username, String newUsername);
+
+  void updateEmail(String username, String newEmail);
 }

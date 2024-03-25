@@ -15,13 +15,13 @@ import lombok.Setter;
 @Builder
 public class ProfileDto {
 
-    @Schema(description = "Имя пользователя", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String username;
+  @Schema(description = "Имя пользователя", requiredMode = Schema.RequiredMode.REQUIRED)
+  private String username;
 
-    @Schema(description = "Email", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String email;
+  @Schema(description = "Email", requiredMode = Schema.RequiredMode.REQUIRED)
+  private String email;
 
-    @Schema(description = "Заблокирован ли пользователь", requiredMode = Schema.RequiredMode.REQUIRED)
-    @JsonProperty("is_enabled")
-    private Boolean isEnabled;
+  @Schema(description = "Заблокирован ли пользователь", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("is_enabled")
+  private Boolean isEnabled;
 }

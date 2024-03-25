@@ -1,9 +1,8 @@
 package com.archipio.userservice.util;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@UtilityClass
 public class ValidationUtils {
 
   public static final int MIN_USERNAME_LENGTH = 1;
