@@ -8,6 +8,7 @@ import static org.mockito.quality.Strictness.LENIENT;
 
 import com.archipio.userservice.dto.ProfileDto;
 import com.archipio.userservice.exception.UserNotFoundException;
+import com.archipio.userservice.exception.UsernameAlreadyExistsException;
 import com.archipio.userservice.mapper.UserMapper;
 import com.archipio.userservice.persistence.entity.User;
 import com.archipio.userservice.persistence.repository.UserRepository;
@@ -38,7 +39,7 @@ class ProfileServiceImplTest {
     final var email = "email";
     final var isEnabled = true;
     final var profileDto =
-            ProfileDto.builder().username(username).email(email).isEnabled(isEnabled).build();
+        ProfileDto.builder().username(username).email(email).isEnabled(isEnabled).build();
 
     final var user = new User();
     user.setUsername(username);
@@ -64,9 +65,69 @@ class ProfileServiceImplTest {
     when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
     // Do
-    assertThatExceptionOfType(UserNotFoundException.class).isThrownBy(() -> profileService.getProfileByUsername(username));
+    assertThatExceptionOfType(UserNotFoundException.class)
+        .isThrownBy(() -> profileService.getProfileByUsername(username));
 
     // Check
     verify(userRepository, times(1)).findByUsername(username);
+  }
+
+  @Test
+  public void updateUsername_whenUserExistsAndNewUsernameIsFree_thenUpdateUsername() {
+    // Prepare
+    final var username = "user";
+    final var newUsername = "new_user";
+
+    final var user = new User();
+    user.setUsername(username);
+
+    when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+    when(userRepository.existsByUsername(newUsername)).thenReturn(false);
+    when(userRepository.save(user)).thenReturn(user);
+
+    // Do
+    profileService.updateUsername(username, newUsername);
+
+    // Check
+    verify(userRepository, times(1)).findByUsername(username);
+    verify(userRepository, times(1)).existsByUsername(newUsername);
+    verify(userRepository, times(1)).save(user);
+  }
+
+  @Test
+  public void updateUsername_whenUserNotExists_thenThrownUserNotFoundException() {
+    // Prepare
+    final var username = "user";
+    final var newUsername = "new_user";
+
+    when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+    // Do
+    assertThatExceptionOfType(UserNotFoundException.class)
+            .isThrownBy(() -> profileService.updateUsername(username, newUsername));
+
+    // Check
+    verify(userRepository, times(1)).findByUsername(username);
+  }
+
+  @Test
+  public void updateUsername_whenUserExistsAndUsernameAlreadyExists_thenThrownUsernameAlreadyExistsException() {
+    // Prepare
+    final var username = "user";
+    final var newUsername = "new_user";
+
+    final var user = new User();
+    user.setUsername(username);
+
+    when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+    when(userRepository.existsByUsername(newUsername)).thenReturn(true);
+
+    // Do
+    assertThatExceptionOfType(UsernameAlreadyExistsException.class)
+            .isThrownBy(() -> profileService.updateUsername(username, newUsername));
+
+    // Check
+    verify(userRepository, times(1)).findByUsername(username);
+    verify(userRepository, times(1)).existsByUsername(newUsername);
   }
 }
