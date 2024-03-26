@@ -3,6 +3,7 @@ package com.archipio.userservice.controller.api.v0;
 import static com.archipio.userservice.util.ApiUtils.ADMIN_PREFIX;
 import static com.archipio.userservice.util.ApiUtils.API_V0_PREFIX;
 import static com.archipio.userservice.util.ApiUtils.BAN_SUFFIX;
+import static com.archipio.userservice.util.ApiUtils.UNBAN_SUFFIX;
 import static org.springframework.http.HttpStatus.OK;
 
 import com.archipio.userservice.service.AdminService;
@@ -25,6 +26,13 @@ public class AdminController {
   @PatchMapping(BAN_SUFFIX)
   public ResponseEntity<Void> banAccount(@RequestParam("username") String username) {
     adminService.banAccount(username);
+    return ResponseEntity.status(OK).build();
+  }
+
+  @PreAuthorize("hasAuthority('UNBAN_ACCOUNT')")
+  @PatchMapping(UNBAN_SUFFIX)
+  public ResponseEntity<Void> unbanAccount(@RequestParam("username") String username) {
+    adminService.unbanAccount(username);
     return ResponseEntity.status(OK).build();
   }
 }
