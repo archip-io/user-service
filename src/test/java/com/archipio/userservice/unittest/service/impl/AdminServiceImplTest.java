@@ -62,7 +62,46 @@ class AdminServiceImplTest {
 
     // Do
     assertThatExceptionOfType(UserNotFoundException.class)
-        .isThrownBy(() -> adminService.banAccount(username));
+            .isThrownBy(() -> adminService.banAccount(username));
+
+    // Check
+    verify(userRepository, times(1)).findByUsername(username);
+  }
+
+  @Test
+  public void unbanAccount_whenUserExists_thenDisableUser() {
+    // Prepare
+    final var username = "user";
+
+    final var user = new User();
+    user.setUsername(username);
+
+    when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+    when(userRepository.save(user)).thenReturn(user);
+
+    // Do
+    adminService.unbanAccount(username);
+
+    // Check
+    verify(userRepository, times(1)).findByUsername(username);
+    verify(userRepository, times(1)).save(user);
+
+    assertThat(user.getIsEnabled()).isTrue();
+  }
+
+  @Test
+  public void unbanAccount_whenUserNotExists_thenThrownUserNotFoundException() {
+    // Prepare
+    final var username = "user";
+
+    final var user = new User();
+    user.setUsername(username);
+
+    when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+    // Do
+    assertThatExceptionOfType(UserNotFoundException.class)
+            .isThrownBy(() -> adminService.unbanAccount(username));
 
     // Check
     verify(userRepository, times(1)).findByUsername(username);

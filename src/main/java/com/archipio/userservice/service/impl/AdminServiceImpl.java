@@ -21,4 +21,12 @@ public class AdminServiceImpl implements AdminService {
     user.setIsEnabled(false);
     userRepository.save(user);
   }
+
+  @Override
+  public void unbanAccount(String username) {
+    var user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+
+    user.setIsEnabled(true);
+    userRepository.save(user);
+  }
 }
