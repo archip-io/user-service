@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.quality.Strictness.LENIENT;
 
 import com.archipio.userservice.dto.ProfileDto;
+import com.archipio.userservice.exception.BadOldPasswordException;
 import com.archipio.userservice.exception.EmailAlreadyExistsException;
 import com.archipio.userservice.exception.InvalidOrExpiredConfirmationTokenException;
 import com.archipio.userservice.exception.UserNotFoundException;
@@ -33,6 +34,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = LENIENT)
@@ -42,6 +44,7 @@ class ProfileServiceImplTest {
   @Mock private UserRepository userRepository;
   @Mock private UserMapper userMapper;
   @Mock private RedisTemplate<String, ProfileServiceImpl.UpdateEmailCache> redisTemplate;
+  @Mock private PasswordEncoder passwordEncoder;
   @InjectMocks private ProfileServiceImpl profileService;
 
   @Test
@@ -243,7 +246,8 @@ class ProfileServiceImplTest {
   }
 
   @Test
-  public void updateEmailConfirm_whenTokenHasExpired_thenInvalidOrExpiredConfirmationTokenException() {
+  public void
+      updateEmailConfirm_whenTokenHasExpired_thenInvalidOrExpiredConfirmationTokenException() {
     // Prepare
     final var username = "user";
     final var token = "token";
@@ -254,7 +258,7 @@ class ProfileServiceImplTest {
 
     // Do
     assertThatExceptionOfType(InvalidOrExpiredConfirmationTokenException.class)
-            .isThrownBy(() -> profileService.updateEmailConfirm(username, token));
+        .isThrownBy(() -> profileService.updateEmailConfirm(username, token));
 
     // Check
     verify(redisTemplate, times(1)).opsForValue();
@@ -262,13 +266,14 @@ class ProfileServiceImplTest {
   }
 
   @Test
-  public void updateEmailConfirm_whenTokenIsInvalid_thenInvalidOrExpiredConfirmationTokenException() {
+  public void
+      updateEmailConfirm_whenTokenIsInvalid_thenInvalidOrExpiredConfirmationTokenException() {
     // Prepare
     final var username = "user";
     final var otherUsername = "other_user";
     final var token = "token";
     var updateEmailCache =
-            ProfileServiceImpl.UpdateEmailCache.builder().username(otherUsername).build();
+        ProfileServiceImpl.UpdateEmailCache.builder().username(otherUsername).build();
     var mockValueOperations = mock(ValueOperations.class);
 
     when(redisTemplate.opsForValue()).thenReturn(mockValueOperations);
@@ -276,7 +281,7 @@ class ProfileServiceImplTest {
 
     // Do
     assertThatExceptionOfType(InvalidOrExpiredConfirmationTokenException.class)
-            .isThrownBy(() -> profileService.updateEmailConfirm(username, token));
+        .isThrownBy(() -> profileService.updateEmailConfirm(username, token));
 
     // Check
     verify(redisTemplate, times(1)).opsForValue();
@@ -288,8 +293,7 @@ class ProfileServiceImplTest {
     // Prepare
     final var username = "user";
     final var token = "token";
-    var updateEmailCache =
-            ProfileServiceImpl.UpdateEmailCache.builder().username(username).build();
+    var updateEmailCache = ProfileServiceImpl.UpdateEmailCache.builder().username(username).build();
     var mockValueOperations = mock(ValueOperations.class);
 
     when(redisTemplate.opsForValue()).thenReturn(mockValueOperations);
@@ -298,7 +302,7 @@ class ProfileServiceImplTest {
 
     // Do
     assertThatExceptionOfType(UserNotFoundException.class)
-            .isThrownBy(() -> profileService.updateEmailConfirm(username, token));
+        .isThrownBy(() -> profileService.updateEmailConfirm(username, token));
 
     // Check
     verify(redisTemplate, times(2)).opsForValue();
@@ -307,13 +311,14 @@ class ProfileServiceImplTest {
   }
 
   @Test
-  public void updateEmailConfirm_whenTokenIsValidAndUserExistsAndEmailAlreadyExists_thenEmailAlreadyExistsException() {
+  public void
+      updateEmailConfirm_whenTokenIsValidAndUserExistsAndEmailAlreadyExists_thenEmailAlreadyExistsException() {
     // Prepare
     final var username = "user";
     final var newEmail = "user@mail.ru";
     final var token = "token";
     var updateEmailCache =
-            ProfileServiceImpl.UpdateEmailCache.builder().username(username).newEmail(newEmail).build();
+        ProfileServiceImpl.UpdateEmailCache.builder().username(username).newEmail(newEmail).build();
     var user = new User();
     var mockValueOperations = mock(ValueOperations.class);
 
@@ -324,12 +329,100 @@ class ProfileServiceImplTest {
 
     // Do
     assertThatExceptionOfType(EmailAlreadyExistsException.class)
-            .isThrownBy(() -> profileService.updateEmailConfirm(username, token));
+        .isThrownBy(() -> profileService.updateEmailConfirm(username, token));
 
     // Check
     verify(redisTemplate, times(2)).opsForValue();
     verify(mockValueOperations, times(1)).get(endsWith(token));
     verify(userRepository, times(1)).findByUsername(username);
     verify(userRepository, times(1)).existsByEmail(updateEmailCache.getNewEmail());
+  }
+
+  @Test
+  public void
+      updatePassword_whenUserExistsAndOldPasswordMatchAndNewPasswordMismatch_thenUpdatePassword() {
+    // Prepare
+    final var username = "user";
+    final var oldPassword = "OldPassword-10";
+    final var newPassword = "NewPassword-10";
+    var user = new User();
+    user.setPassword(oldPassword);
+
+    when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+    when(passwordEncoder.matches(oldPassword, user.getPassword())).thenReturn(true);
+    when(passwordEncoder.matches(newPassword, user.getPassword())).thenReturn(false);
+    when(passwordEncoder.encode(newPassword)).thenReturn(newPassword);
+    when(userRepository.save(user)).thenReturn(user);
+
+    // Do
+    profileService.updatePassword(username, oldPassword, newPassword);
+
+    // Check
+    verify(userRepository, times(1)).findByUsername(username);
+    verify(passwordEncoder, times(1)).matches(oldPassword, oldPassword);
+    verify(passwordEncoder, times(1)).matches(newPassword, oldPassword);
+    verify(passwordEncoder, times(1)).encode(newPassword);
+    verify(userRepository, times(1)).save(user);
+  }
+
+  @Test
+  public void updatePassword_whenUserExistsAndOldPasswordMatchAndNewPasswordMatch_thenNothing() {
+    // Prepare
+    final var username = "user";
+    final var oldPassword = "OldPassword-10";
+    final var newPassword = "NewPassword-10";
+    var user = new User();
+    user.setPassword(oldPassword);
+
+    when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+    when(passwordEncoder.matches(oldPassword, user.getPassword())).thenReturn(true);
+    when(passwordEncoder.matches(newPassword, user.getPassword())).thenReturn(true);
+
+    // Do
+    profileService.updatePassword(username, oldPassword, newPassword);
+
+    // Check
+    verify(userRepository, times(1)).findByUsername(username);
+    verify(passwordEncoder, times(1)).matches(oldPassword, oldPassword);
+    verify(passwordEncoder, times(1)).matches(newPassword, oldPassword);
+  }
+
+  @Test
+  public void updatePassword_whenUserNotExists_thenThrownUserNotFoundException() {
+    // Prepare
+    final var username = "user";
+    final var oldPassword = "OldPassword-10";
+    final var newPassword = "NewPassword-10";
+
+    when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+    // Do
+    assertThatExceptionOfType(UserNotFoundException.class)
+        .isThrownBy(() -> profileService.updatePassword(username, oldPassword, newPassword));
+
+    // Check
+    verify(userRepository, times(1)).findByUsername(username);
+  }
+
+  @Test
+  public void
+      updatePassword_whenUserExistsAndOldPasswordMismatch_thenThrownBadOldPasswordException() {
+    // Prepare
+    final var username = "user";
+    final var oldPassword = "OldPassword-10";
+    final var newPassword = "NewPassword-10";
+    var user = new User();
+    user.setPassword(oldPassword);
+
+    when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+    when(passwordEncoder.matches(oldPassword, user.getPassword())).thenReturn(false);
+
+    // Do
+    assertThatExceptionOfType(BadOldPasswordException.class)
+        .isThrownBy(() -> profileService.updatePassword(username, oldPassword, newPassword));
+
+    // Check
+    verify(userRepository, times(1)).findByUsername(username);
+    verify(passwordEncoder, times(1)).matches(oldPassword, oldPassword);
   }
 }

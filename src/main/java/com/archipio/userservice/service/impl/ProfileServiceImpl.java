@@ -3,6 +3,7 @@ package com.archipio.userservice.service.impl;
 import static com.archipio.userservice.util.CacheUtils.UPDATE_EMAIL_CACHE_TTL_S;
 
 import com.archipio.userservice.dto.ProfileDto;
+import com.archipio.userservice.exception.BadOldPasswordException;
 import com.archipio.userservice.exception.EmailAlreadyExistsException;
 import com.archipio.userservice.exception.InvalidOrExpiredConfirmationTokenException;
 import com.archipio.userservice.exception.UserNotFoundException;
@@ -19,6 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,6 +32,7 @@ public class ProfileServiceImpl implements ProfileService {
   private final UserRepository userRepository;
   private final UserMapper userMapper;
   private final RedisTemplate<String, UpdateEmailCache> redisTemplate;
+  private final PasswordEncoder passwordEncoder;
 
   @Override
   public ProfileDto getProfileByUsername(String username) {
@@ -86,6 +89,20 @@ public class ProfileServiceImpl implements ProfileService {
     userRepository.save(user);
 
     // TODO: Добавить событие о смене email
+  }
+
+  @Override
+  public void updatePassword(String username, String oldPassword, String newPassword) {
+    var user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+    if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+      throw new BadOldPasswordException();
+    }
+    if (passwordEncoder.matches(newPassword, user.getPassword())) {
+      return;
+    }
+
+    user.setPassword(passwordEncoder.encode(newPassword));
+    userRepository.save(user);
   }
 
   @Getter

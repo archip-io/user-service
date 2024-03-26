@@ -4,6 +4,7 @@ import static com.archipio.userservice.util.ApiUtils.API_V0_PREFIX;
 import static com.archipio.userservice.util.ApiUtils.FIND_PROFILE_SUFFIX;
 import static com.archipio.userservice.util.ApiUtils.UPDATE_EMAIL_CONFIRM_SUFFIX;
 import static com.archipio.userservice.util.ApiUtils.UPDATE_EMAIL_SUFFIX;
+import static com.archipio.userservice.util.ApiUtils.UPDATE_PASSWORD_SUFFIX;
 import static com.archipio.userservice.util.ApiUtils.UPDATE_USERNAME_SUFFIX;
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.OK;
@@ -11,6 +12,7 @@ import static org.springframework.http.HttpStatus.OK;
 import com.archipio.commonauth.UserDetailsImpl;
 import com.archipio.userservice.dto.ProfileDto;
 import com.archipio.userservice.dto.UpdateEmailDto;
+import com.archipio.userservice.dto.UpdatePasswordDto;
 import com.archipio.userservice.dto.UpdateUsernameDto;
 import com.archipio.userservice.service.ProfileService;
 import jakarta.validation.Valid;
@@ -52,8 +54,8 @@ public class ProfileController {
   @PreAuthorize("hasAuthority('UPDATE_EMAIL')")
   @PutMapping(UPDATE_EMAIL_SUFFIX)
   public ResponseEntity<Void> updateEmail(
-          @Valid @RequestBody UpdateEmailDto updateEmailDto,
-          @AuthenticationPrincipal UserDetailsImpl principal) {
+      @Valid @RequestBody UpdateEmailDto updateEmailDto,
+      @AuthenticationPrincipal UserDetailsImpl principal) {
     if (!principal.getEmail().equals(updateEmailDto.getEmail())) {
       profileService.updateEmail(principal.getUsername(), updateEmailDto.getEmail());
     }
@@ -63,9 +65,20 @@ public class ProfileController {
   @PreAuthorize("hasAuthority('UPDATE_EMAIL')")
   @GetMapping(UPDATE_EMAIL_CONFIRM_SUFFIX)
   public ResponseEntity<Void> updateEmailConfirm(
-          @RequestParam("token") String token,
-          @AuthenticationPrincipal UserDetailsImpl principal) {
+      @RequestParam("token") String token, @AuthenticationPrincipal UserDetailsImpl principal) {
     profileService.updateEmailConfirm(principal.getUsername(), token);
+    return ResponseEntity.status(OK).build();
+  }
+
+  @PreAuthorize("hasAuthority('UPDATE_PASSWORD')")
+  @PutMapping(UPDATE_PASSWORD_SUFFIX)
+  public ResponseEntity<Void> updatePassword(
+      @Valid @RequestBody UpdatePasswordDto updatePasswordDto,
+      @AuthenticationPrincipal UserDetailsImpl principal) {
+    profileService.updatePassword(
+        principal.getUsername(),
+        updatePasswordDto.getOldPassword(),
+        updatePasswordDto.getNewPassword());
     return ResponseEntity.status(OK).build();
   }
 }

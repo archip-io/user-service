@@ -8,6 +8,7 @@ import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import com.archipio.userservice.dto.ErrorDto;
+import com.archipio.userservice.exception.BadOldPasswordException;
 import com.archipio.userservice.exception.BadPasswordException;
 import com.archipio.userservice.exception.EmailAlreadyExistsException;
 import com.archipio.userservice.exception.InvalidOrExpiredConfirmationTokenException;
@@ -173,19 +174,32 @@ public class ExceptionCatcher {
                 .build());
   }
 
+  @ExceptionHandler(BadOldPasswordException.class)
+  public ResponseEntity<ErrorDto> handleBadOldPasswordException(
+      HttpServletRequest request, BadOldPasswordException e) {
+    return ResponseEntity.status(BAD_REQUEST)
+        .body(
+            ErrorDto.builder()
+                .createdAt(Instant.now())
+                .message(
+                    messageSource.getMessage(
+                        "exception.bad-old-password", null, RequestContextUtils.getLocale(request)))
+                .build());
+  }
+
   @ExceptionHandler(InvalidOrExpiredConfirmationTokenException.class)
   public ResponseEntity<ErrorDto> handleInvalidOrExpiredTokenException(
-          HttpServletRequest request, InvalidOrExpiredConfirmationTokenException e) {
+      HttpServletRequest request, InvalidOrExpiredConfirmationTokenException e) {
     return ResponseEntity.status(BAD_REQUEST)
-            .body(
-                    ErrorDto.builder()
-                            .createdAt(Instant.now())
-                            .message(
-                                    messageSource.getMessage(
-                                            "exception.invalid-or-expired-confirmation-token",
-                                            null,
-                                            RequestContextUtils.getLocale(request)))
-                            .build());
+        .body(
+            ErrorDto.builder()
+                .createdAt(Instant.now())
+                .message(
+                    messageSource.getMessage(
+                        "exception.invalid-or-expired-confirmation-token",
+                        null,
+                        RequestContextUtils.getLocale(request)))
+                .build());
   }
 
   @ExceptionHandler(AccessDeniedException.class)

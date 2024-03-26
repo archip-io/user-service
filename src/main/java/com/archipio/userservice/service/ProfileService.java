@@ -11,4 +11,6 @@ public interface ProfileService {
   void updateEmail(String username, String newEmail);
 
   void updateEmailConfirm(String username, String token);
+
+  void updatePassword(String username, String oldPassword, String newPassword);
 }
