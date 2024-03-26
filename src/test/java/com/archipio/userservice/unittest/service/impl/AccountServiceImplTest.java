@@ -3,6 +3,7 @@ package com.archipio.userservice.unittest.service.impl;
 import static com.archipio.userservice.util.CacheUtils.UPDATE_EMAIL_CACHE_TTL_S;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.endsWith;
 import static org.mockito.ArgumentMatchers.eq;
@@ -22,13 +23,17 @@ import com.archipio.userservice.exception.UsernameAlreadyExistsException;
 import com.archipio.userservice.mapper.UserMapper;
 import com.archipio.userservice.persistence.entity.User;
 import com.archipio.userservice.persistence.repository.UserRepository;
-import com.archipio.userservice.service.impl.ProfileServiceImpl;
+import com.archipio.userservice.service.impl.AccountServiceImpl;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -40,13 +45,40 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = LENIENT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class ProfileServiceImplTest {
+class AccountServiceImplTest {
 
   @Mock private UserRepository userRepository;
   @Mock private UserMapper userMapper;
-  @Mock private RedisTemplate<String, ProfileServiceImpl.UpdateEmailCache> redisTemplate;
+  @Mock private RedisTemplate<String, AccountServiceImpl.UpdateEmailCache> redisTemplate;
   @Mock private PasswordEncoder passwordEncoder;
-  @InjectMocks private ProfileServiceImpl profileService;
+  @InjectMocks private AccountServiceImpl profileService;
+
+  private static Stream<Arguments> provideNullParameters_getProfileByUsername() {
+    return Stream.of(Arguments.of((String) null));
+  }
+
+  private static Stream<Arguments> provideNullParameters_updateUsername() {
+    return Stream.of(Arguments.of(null, "newUsername"), Arguments.of("username", null));
+  }
+
+  private static Stream<Arguments> provideNullParameters_updateEmail() {
+    return Stream.of(Arguments.of(null, "user@mail.ru"), Arguments.of("username", null));
+  }
+
+  private static Stream<Arguments> provideNullParameters_updateEmailConfirm() {
+    return Stream.of(Arguments.of(null, "token"), Arguments.of("username", null));
+  }
+
+  private static Stream<Arguments> provideNullParameters_updatePassword() {
+    return Stream.of(
+        Arguments.of(null, "oldPassword", "newPassword"),
+        Arguments.of("username", null, "newPassword"),
+        Arguments.of("username", "oldPassword", null));
+  }
+
+  private static Stream<Arguments> provideNullParameters_deleteAccount() {
+    return Stream.of(Arguments.of((String) null));
+  }
 
   @Test
   public void getProfileByUsername_whenUserExists_thenHisProfile() {
@@ -73,6 +105,13 @@ class ProfileServiceImplTest {
     verify(userMapper, times(1)).toProfile(user);
 
     assertThat(actualProfileDto).isEqualTo(profileDto);
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideNullParameters_getProfileByUsername")
+  public void getProfileByUsername_whenParametersIsNull_thenNullPointerException(String username) {
+    assertThatNullPointerException()
+        .isThrownBy(() -> profileService.getProfileByUsername(username));
   }
 
   @Test
@@ -112,6 +151,14 @@ class ProfileServiceImplTest {
     verify(userRepository, times(1)).save(user);
 
     assertThat(user.getUsername()).isEqualTo(newUsername);
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideNullParameters_updateUsername")
+  public void updateUsername_whenParametersIsNull_thenNullPointerException(
+      String username, String newUsername) {
+    assertThatNullPointerException()
+        .isThrownBy(() -> profileService.updateUsername(username, newUsername));
   }
 
   @Test
@@ -166,7 +213,7 @@ class ProfileServiceImplTest {
         .when(mockValueOperations)
         .set(
             any(String.class),
-            eq(ProfileServiceImpl.UpdateEmailCache.class),
+            eq(AccountServiceImpl.UpdateEmailCache.class),
             eq(UPDATE_EMAIL_CACHE_TTL_S),
             eq(TimeUnit.SECONDS));
 
@@ -180,9 +227,17 @@ class ProfileServiceImplTest {
     verify(mockValueOperations, times(1))
         .set(
             any(String.class),
-            any(ProfileServiceImpl.UpdateEmailCache.class),
+            any(AccountServiceImpl.UpdateEmailCache.class),
             eq(UPDATE_EMAIL_CACHE_TTL_S),
             eq(TimeUnit.SECONDS));
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideNullParameters_updateEmail")
+  public void updateEmail_whenParametersIsNull_thenNullPointerException(
+      String username, String newEmail) {
+    assertThatNullPointerException()
+        .isThrownBy(() -> profileService.updateEmail(username, newEmail));
   }
 
   @Test
@@ -227,7 +282,7 @@ class ProfileServiceImplTest {
     final var newEmail = "user@mail.ru";
     final var token = "token";
     var updateEmailCache =
-        ProfileServiceImpl.UpdateEmailCache.builder().username(username).newEmail(newEmail).build();
+        AccountServiceImpl.UpdateEmailCache.builder().username(username).newEmail(newEmail).build();
     var user = new User();
     var mockValueOperations = mock(ValueOperations.class);
 
@@ -250,6 +305,14 @@ class ProfileServiceImplTest {
     verify(userRepository, times(1)).save(user);
 
     assertThat(user.getEmail()).isEqualTo(newEmail);
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideNullParameters_updateEmailConfirm")
+  public void updateEmailConfirm_whenParametersIsNull_thenNullPointerException(
+      String username, String token) {
+    assertThatNullPointerException()
+        .isThrownBy(() -> profileService.updateEmailConfirm(username, token));
   }
 
   @Test
@@ -280,7 +343,7 @@ class ProfileServiceImplTest {
     final var otherUsername = "other_user";
     final var token = "token";
     var updateEmailCache =
-        ProfileServiceImpl.UpdateEmailCache.builder().username(otherUsername).build();
+        AccountServiceImpl.UpdateEmailCache.builder().username(otherUsername).build();
     var mockValueOperations = mock(ValueOperations.class);
 
     when(redisTemplate.opsForValue()).thenReturn(mockValueOperations);
@@ -300,7 +363,7 @@ class ProfileServiceImplTest {
     // Prepare
     final var username = "user";
     final var token = "token";
-    var updateEmailCache = ProfileServiceImpl.UpdateEmailCache.builder().username(username).build();
+    var updateEmailCache = AccountServiceImpl.UpdateEmailCache.builder().username(username).build();
     var mockValueOperations = mock(ValueOperations.class);
 
     when(redisTemplate.opsForValue()).thenReturn(mockValueOperations);
@@ -325,7 +388,7 @@ class ProfileServiceImplTest {
     final var newEmail = "user@mail.ru";
     final var token = "token";
     var updateEmailCache =
-        ProfileServiceImpl.UpdateEmailCache.builder().username(username).newEmail(newEmail).build();
+        AccountServiceImpl.UpdateEmailCache.builder().username(username).newEmail(newEmail).build();
     var user = new User();
     var mockValueOperations = mock(ValueOperations.class);
 
@@ -396,6 +459,14 @@ class ProfileServiceImplTest {
     verify(passwordEncoder, times(1)).matches(newPassword, oldPassword);
   }
 
+  @ParameterizedTest
+  @MethodSource("provideNullParameters_updatePassword")
+  public void updatePassword_whenParametersIsNull_thenNullPointerException(
+      String username, String oldPassword, String newPassword) {
+    assertThatNullPointerException()
+        .isThrownBy(() -> profileService.updatePassword(username, oldPassword, newPassword));
+  }
+
   @Test
   public void updatePassword_whenUserNotExists_thenThrownUserNotFoundException() {
     // Prepare
@@ -450,6 +521,12 @@ class ProfileServiceImplTest {
     // Check
     verify(userRepository, times(1)).findByUsername(username);
     verify(userRepository, times(1)).delete(user);
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideNullParameters_deleteAccount")
+  public void deleteAccount_whenParametersIsNull_thenNullPointerException(String username) {
+    assertThatNullPointerException().isThrownBy(() -> profileService.deleteAccount(username));
   }
 
   @Test

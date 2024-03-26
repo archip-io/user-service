@@ -2,6 +2,7 @@ package com.archipio.userservice.unittest.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,11 +24,15 @@ import com.archipio.userservice.persistence.repository.RoleRepository;
 import com.archipio.userservice.persistence.repository.UserRepository;
 import com.archipio.userservice.service.impl.UserServiceImpl;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -45,9 +50,17 @@ class UserServiceImplTest {
   @Mock private BCryptPasswordEncoder passwordEncoder;
   @InjectMocks private UserServiceImpl userService;
 
+  private static Stream<Arguments> provideNullParameters_findByLogin() {
+    return Stream.of(Arguments.of((String) null));
+  }
+
+  private static Stream<Arguments> provideNullParameters_findByUsernameAndEmail() {
+    return Stream.of(Arguments.of(null, "user@mail.ru"), Arguments.of("username", null));
+  }
+
   @Test
   @Order(2)
-  public void saveCredentials_uniqueUser_nothing() {
+  public void saveCredentials_whenUniqueUser_thenSaveUser() {
     // Prepare
     final var username = "user";
     final var email = "email";
@@ -101,7 +114,7 @@ class UserServiceImplTest {
   }
 
   @Test
-  public void saveCredentials_usernameAlreadyExists_thrownUsernameAlreadyExistsException() {
+  public void saveCredentials_whenUsernameAlreadyExists_thenThrownUsernameAlreadyExistsException() {
     // Prepare
     final var username = "user";
     final var email = "email";
@@ -119,7 +132,7 @@ class UserServiceImplTest {
   }
 
   @Test
-  public void saveCredentials_emailAlreadyExists_thrownEmailAlreadyExistsException() {
+  public void saveCredentials_whenEmailAlreadyExists_thenThrownEmailAlreadyExistsException() {
     // Prepare
     final var username = "user";
     final var email = "email";
@@ -140,7 +153,7 @@ class UserServiceImplTest {
 
   @Test
   @Order(1)
-  public void saveCredentials_notFoundRole_thrownRoleNotFoundException() {
+  public void saveCredentials_whenNotFoundRole_thenThrownRoleNotFoundException() {
     // Prepare
     final var username = "user";
     final var email = "email";
@@ -173,7 +186,7 @@ class UserServiceImplTest {
   }
 
   @Test
-  public void findByLogin_userExists_credentialsOutputDto() {
+  public void findByLogin_whenUserExists_thenReturnCredentials() {
     // Prepare
     final var login = "login";
     final var user = new User();
@@ -191,8 +204,14 @@ class UserServiceImplTest {
     assertThat(actualCredentialsOutputDto).isEqualTo(credentialsOutputDto);
   }
 
+  @ParameterizedTest
+  @MethodSource("provideNullParameters_findByLogin")
+  public void findByLogin_whenParametersIsNull_thenNullPointerException(String username) {
+    assertThatNullPointerException().isThrownBy(() -> userService.findByLogin(username));
+  }
+
   @Test
-  public void findByLogin_userNotFound_thrownUserNotFoundException() {
+  public void findByLogin_whenUserNotFound_thenThrownUserNotFoundException() {
     // Prepare
     final var login = "login";
     when(userRepository.findByLogin(login)).thenReturn(Optional.empty());
@@ -206,7 +225,7 @@ class UserServiceImplTest {
   }
 
   @Test
-  public void findByUsernameAndEmail_userExists_credentialsOutputDto() {
+  public void findByUsernameAndEmail_whenUserExists_thenReturnCredentials() {
     // Prepare
     final var username = "user";
     final var email = "email";
@@ -225,8 +244,16 @@ class UserServiceImplTest {
     assertThat(actualCredentialsOutputDto).isEqualTo(credentialsOutputDto);
   }
 
+  @ParameterizedTest
+  @MethodSource("provideNullParameters_findByUsernameAndEmail")
+  public void findByUsernameAndEmail_whenParametersIsNull_thenNullPointerException(
+      String username, String email) {
+    assertThatNullPointerException()
+        .isThrownBy(() -> userService.findByUsernameAndEmail(username, email));
+  }
+
   @Test
-  public void findByUsernameAndEmail_userNotFound_thrownUserNotFoundException() {
+  public void findByUsernameAndEmail_whenUserNotFound_thenThrownUserNotFoundException() {
     // Prepare
     final var username = "user";
     final var email = "email";
@@ -241,7 +268,7 @@ class UserServiceImplTest {
   }
 
   @Test
-  public void resetPassword_userExists_nothing() {
+  public void resetPassword_whenUserExists_thenSavePasswordInCache() {
     // Prepare
     final var login = "login";
     final var password = "password";
@@ -261,7 +288,7 @@ class UserServiceImplTest {
   }
 
   @Test
-  public void resetPassword_userNotFound_thrownUserNotFoundException() {
+  public void resetPassword_whenUserNotFound_thenThrownUserNotFoundException() {
     // Prepare
     final var login = "login";
     final var password = "password";
@@ -277,7 +304,7 @@ class UserServiceImplTest {
   }
 
   @Test
-  public void validatePassword_userExistsAndPasswordIsCorrect_nothing() {
+  public void validatePassword_whenUserExistsAndPasswordIsCorrect_thenNothing() {
     // Prepare
     final var login = "login";
     final var password = "password";
@@ -299,7 +326,7 @@ class UserServiceImplTest {
   }
 
   @Test
-  public void validatePassword_userNotFound_thrownUserNotFoundException() {
+  public void validatePassword_whenUserNotFound_thenThrownUserNotFoundException() {
     // Prepare
     final var login = "login";
     final var password = "password";
@@ -316,7 +343,8 @@ class UserServiceImplTest {
   }
 
   @Test
-  public void validatePassword_userExistsAndPasswordIsIncorrect_thrownBadPasswordException() {
+  public void
+      validatePassword_whenUserExistsAndPasswordIsIncorrect_thenThrownBadPasswordException() {
     // Prepare
     final var login = "login";
     final var password = "password";

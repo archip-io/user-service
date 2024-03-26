@@ -14,11 +14,14 @@ import com.archipio.userservice.persistence.entity.Role;
 import com.archipio.userservice.persistence.repository.RoleRepository;
 import com.archipio.userservice.persistence.repository.UserRepository;
 import com.archipio.userservice.service.UserService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
@@ -31,6 +34,7 @@ public class UserServiceImpl implements UserService {
   private final UserMapper userMapper;
   private final BCryptPasswordEncoder passwordEncoder;
 
+  @Transactional
   @Override
   public void saveCredentials(CredentialsInputDto credentialsInputDto) {
     if (userRepository.existsByUsername(credentialsInputDto.getUsername())) {
@@ -50,13 +54,14 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public CredentialsOutputDto findByLogin(String login) {
+  public CredentialsOutputDto findByLogin(@NonNull String login) {
     var user = userRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
     return userMapper.toCredentialsOutput(user);
   }
 
   @Override
-  public CredentialsOutputDto findByUsernameAndEmail(String username, String email) {
+  public CredentialsOutputDto findByUsernameAndEmail(
+      @NonNull String username, @NonNull String email) {
     var user =
         userRepository
             .findByUsernameAndEmail(username, email)
@@ -64,6 +69,7 @@ public class UserServiceImpl implements UserService {
     return userMapper.toCredentialsOutput(user);
   }
 
+  @Transactional
   @Override
   public void resetPassword(ResetPasswordDto resetPasswordDto) {
     var user =

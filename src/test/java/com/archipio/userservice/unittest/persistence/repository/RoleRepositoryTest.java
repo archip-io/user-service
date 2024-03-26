@@ -18,7 +18,7 @@ class RoleRepositoryTest {
   @Autowired private RoleRepository roleRepository;
 
   @Test
-  void findByName_roleExists_optionalRole() {
+  void findByName_whenRoleExists_thenReturnRole() {
     // Prepare
     final var name = "USER";
 
@@ -36,7 +36,7 @@ class RoleRepositoryTest {
   }
 
   @Test
-  void findByName_roleNotExists_emptyOptional() {
+  void findByName_whenRoleNotExists_thenEmptyOptional() {
     // Prepare
     final var name = "USER";
 

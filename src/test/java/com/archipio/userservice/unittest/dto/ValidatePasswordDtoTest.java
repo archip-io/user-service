@@ -37,7 +37,7 @@ public class ValidatePasswordDtoTest {
 
   @ParameterizedTest
   @MethodSource("provideInvalidValidatePasswordDto")
-  public void validate_invalidValidatePasswordDto_violationsIsNotEmpty(
+  public void validate_whenValidatePasswordDtoIsInvalid_thenViolationsIsNotEmpty(
       ValidatePasswordDto validatePasswordDto, Set<String> expectedErrorFields) {
     // Do
     var violations = validator.validate(validatePasswordDto);

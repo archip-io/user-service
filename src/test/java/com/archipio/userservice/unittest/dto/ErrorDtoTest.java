@@ -18,7 +18,7 @@ public class ErrorDtoTest {
   @Autowired private JacksonTester<ErrorDto> errorDtoJson;
 
   @Test
-  public void check_errorDtoTestWithoutErrors_jsonWithoutErrors() throws IOException {
+  public void checkSerializationOfErrorDtoTestWithoutErrors() throws IOException {
     // Prepare
     final Instant createdAt = Instant.now();
     final String message = "Message";
@@ -39,7 +39,7 @@ public class ErrorDtoTest {
   }
 
   @Test
-  public void check_errorDtoTestWithErrors_jsonWithErrors() throws IOException {
+  public void checkSerializationOfErrorDtoTestWithErrors() throws IOException {
     // Prepare
     final Instant createdAt = Instant.now();
     final String message = "Message";

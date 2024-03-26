@@ -13,8 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,22 +25,22 @@ public class AdminController {
   private final AdminService adminService;
 
   @PreAuthorize("hasAuthority('BAN_ACCOUNT')")
-  @PatchMapping(BAN_SUFFIX)
-  public ResponseEntity<Void> banAccount(@RequestParam("username") String username) {
+  @PatchMapping(BAN_SUFFIX + "/{username}")
+  public ResponseEntity<Void> banAccount(@PathVariable("username") String username) {
     adminService.banAccount(username);
     return ResponseEntity.status(OK).build();
   }
 
   @PreAuthorize("hasAuthority('UNBAN_ACCOUNT')")
-  @PatchMapping(UNBAN_SUFFIX)
-  public ResponseEntity<Void> unbanAccount(@RequestParam("username") String username) {
+  @PatchMapping(UNBAN_SUFFIX + "/{username}")
+  public ResponseEntity<Void> unbanAccount(@PathVariable("username") String username) {
     adminService.unbanAccount(username);
     return ResponseEntity.status(OK).build();
   }
 
   @PreAuthorize("hasAuthority('DELETE_USER_ACCOUNT')")
-  @DeleteMapping(DELETE_USER_ACCOUNT_SUFFIX)
-  public ResponseEntity<Void> deleteUserAccount(@RequestParam("username") String username) {
+  @DeleteMapping(DELETE_USER_ACCOUNT_SUFFIX + "/{username}")
+  public ResponseEntity<Void> deleteUserAccount(@PathVariable("username") String username) {
     adminService.deleteUserAccount(username);
     return ResponseEntity.status(OK).build();
   }

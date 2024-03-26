@@ -10,15 +10,15 @@ import com.archipio.userservice.exception.UserNotFoundException;
 import com.archipio.userservice.exception.UsernameAlreadyExistsException;
 import com.archipio.userservice.mapper.UserMapper;
 import com.archipio.userservice.persistence.repository.UserRepository;
-import com.archipio.userservice.service.ProfileService;
+import com.archipio.userservice.service.AccountService;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class ProfileServiceImpl implements ProfileService {
+public class AccountServiceImpl implements AccountService {
 
   private static final String UPDATE_EMAIL_KEY_PREFIX = "service:profile:update_email:";
 
@@ -37,14 +37,14 @@ public class ProfileServiceImpl implements ProfileService {
   private final PasswordEncoder passwordEncoder;
 
   @Override
-  public ProfileDto getProfileByUsername(String username) {
+  public ProfileDto getProfileByUsername(@NonNull String username) {
     var user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
     return userMapper.toProfile(user);
   }
 
   @Transactional
   @Override
-  public void updateUsername(String username, String newUsername) {
+  public void updateUsername(@NonNull String username, @NonNull String newUsername) {
     var user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
     if (userRepository.existsByUsername(newUsername)) {
       throw new UsernameAlreadyExistsException();
@@ -57,7 +57,7 @@ public class ProfileServiceImpl implements ProfileService {
   }
 
   @Override
-  public void updateEmail(String username, String newEmail) {
+  public void updateEmail(@NonNull String username, @NonNull String newEmail) {
     if (!userRepository.existsByUsername(username)) {
       throw new UserNotFoundException();
     }
@@ -76,7 +76,7 @@ public class ProfileServiceImpl implements ProfileService {
 
   @Transactional
   @Override
-  public void updateEmailConfirm(String username, String token) {
+  public void updateEmailConfirm(@NonNull String username, @NonNull String token) {
     var registrationDto = redisTemplate.opsForValue().get(UPDATE_EMAIL_KEY_PREFIX + token);
     if (registrationDto == null || !registrationDto.getUsername().equals(username)) {
       throw new InvalidOrExpiredConfirmationTokenException();
@@ -97,7 +97,8 @@ public class ProfileServiceImpl implements ProfileService {
 
   @Transactional
   @Override
-  public void updatePassword(String username, String oldPassword, String newPassword) {
+  public void updatePassword(
+      @NonNull String username, @NonNull String oldPassword, @NonNull String newPassword) {
     var user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
     if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
       throw new BadOldPasswordException();
@@ -112,13 +113,12 @@ public class ProfileServiceImpl implements ProfileService {
 
   @Transactional
   @Override
-  public void deleteAccount(String username) {
+  public void deleteAccount(@NonNull String username) {
     var user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
     userRepository.delete(user);
   }
 
-  @Getter
-  @Setter
+  @Data
   @NoArgsConstructor
   @AllArgsConstructor
   @Builder

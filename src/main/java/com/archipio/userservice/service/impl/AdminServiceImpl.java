@@ -3,6 +3,7 @@ package com.archipio.userservice.service.impl;
 import com.archipio.userservice.exception.UserNotFoundException;
 import com.archipio.userservice.persistence.repository.UserRepository;
 import com.archipio.userservice.service.AdminService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +17,7 @@ public class AdminServiceImpl implements AdminService {
 
   @Transactional
   @Override
-  public void banAccount(String username) {
+  public void banAccount(@NonNull String username) {
     var user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
     user.setIsEnabled(false);
@@ -25,7 +26,7 @@ public class AdminServiceImpl implements AdminService {
 
   @Transactional
   @Override
-  public void unbanAccount(String username) {
+  public void unbanAccount(@NonNull String username) {
     var user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
     user.setIsEnabled(true);
@@ -34,7 +35,7 @@ public class AdminServiceImpl implements AdminService {
 
   @Transactional
   @Override
-  public void deleteUserAccount(String username) {
+  public void deleteUserAccount(@NonNull String username) {
     var user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
     userRepository.delete(user);
   }

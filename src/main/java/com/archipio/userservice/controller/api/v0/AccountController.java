@@ -15,15 +15,16 @@ import com.archipio.userservice.dto.ProfileDto;
 import com.archipio.userservice.dto.UpdateEmailDto;
 import com.archipio.userservice.dto.UpdatePasswordDto;
 import com.archipio.userservice.dto.UpdateUsernameDto;
-import com.archipio.userservice.service.ProfileService;
+import com.archipio.userservice.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,33 +33,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(API_V0_PREFIX)
-public class ProfileController {
+public class AccountController {
 
-  private final ProfileService profileService;
+  private final AccountService accountService;
 
-  @GetMapping(FIND_PROFILE_SUFFIX + "{username}")
+  @GetMapping(FIND_PROFILE_SUFFIX + "/{username}")
   public ResponseEntity<ProfileDto> findProfile(@PathVariable("username") String username) {
-    return ResponseEntity.status(OK).body(profileService.getProfileByUsername(username));
+    return ResponseEntity.status(OK).body(accountService.getProfileByUsername(username));
   }
 
   @PreAuthorize("hasAuthority('UPDATE_USERNAME')")
-  @PutMapping(UPDATE_USERNAME_SUFFIX)
+  @PatchMapping(UPDATE_USERNAME_SUFFIX)
   public ResponseEntity<Void> updateUsername(
       @Valid @RequestBody UpdateUsernameDto updateUsernameDto,
       @AuthenticationPrincipal UserDetailsImpl principal) {
     if (!principal.getUsername().equals(updateUsernameDto.getUsername())) {
-      profileService.updateUsername(principal.getUsername(), updateUsernameDto.getUsername());
+      accountService.updateUsername(principal.getUsername(), updateUsernameDto.getUsername());
     }
     return ResponseEntity.status(OK).build();
   }
 
   @PreAuthorize("hasAuthority('UPDATE_EMAIL')")
-  @PutMapping(UPDATE_EMAIL_SUFFIX)
+  @PatchMapping(UPDATE_EMAIL_SUFFIX)
   public ResponseEntity<Void> updateEmail(
       @Valid @RequestBody UpdateEmailDto updateEmailDto,
       @AuthenticationPrincipal UserDetailsImpl principal) {
     if (!principal.getEmail().equals(updateEmailDto.getEmail())) {
-      profileService.updateEmail(principal.getUsername(), updateEmailDto.getEmail());
+      accountService.updateEmail(principal.getUsername(), updateEmailDto.getEmail());
     }
     return ResponseEntity.status(ACCEPTED).build();
   }
@@ -67,16 +68,16 @@ public class ProfileController {
   @GetMapping(UPDATE_EMAIL_CONFIRM_SUFFIX)
   public ResponseEntity<Void> updateEmailConfirm(
       @RequestParam("token") String token, @AuthenticationPrincipal UserDetailsImpl principal) {
-    profileService.updateEmailConfirm(principal.getUsername(), token);
+    accountService.updateEmailConfirm(principal.getUsername(), token);
     return ResponseEntity.status(OK).build();
   }
 
   @PreAuthorize("hasAuthority('UPDATE_PASSWORD')")
-  @PutMapping(UPDATE_PASSWORD_SUFFIX)
+  @PatchMapping(UPDATE_PASSWORD_SUFFIX)
   public ResponseEntity<Void> updatePassword(
       @Valid @RequestBody UpdatePasswordDto updatePasswordDto,
       @AuthenticationPrincipal UserDetailsImpl principal) {
-    profileService.updatePassword(
+    accountService.updatePassword(
         principal.getUsername(),
         updatePasswordDto.getOldPassword(),
         updatePasswordDto.getNewPassword());
@@ -84,9 +85,9 @@ public class ProfileController {
   }
 
   @PreAuthorize("hasAuthority('DELETE_ACCOUNT')")
-  @PutMapping(DELETE_ACCOUNT_SUFFIX)
+  @DeleteMapping(DELETE_ACCOUNT_SUFFIX)
   public ResponseEntity<Void> deleteAccount(@AuthenticationPrincipal UserDetailsImpl principal) {
-    profileService.deleteAccount(principal.getUsername());
+    accountService.deleteAccount(principal.getUsername());
     return ResponseEntity.status(OK).build();
   }
 }

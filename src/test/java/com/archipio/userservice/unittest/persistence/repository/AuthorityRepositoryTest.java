@@ -18,7 +18,7 @@ class AuthorityRepositoryTest {
   @Autowired private AuthorityRepository authorityRepository;
 
   @Test
-  void findByName_authorityExists_optionalAuthority() {
+  void findByName_whenAuthorityExists_thenReturnAuthority() {
     // Prepare
     final var name = "DELETE_USER";
 
@@ -36,7 +36,7 @@ class AuthorityRepositoryTest {
   }
 
   @Test
-  void findByName_authorityNotExists_emptyOptional() {
+  void findByName_whenAuthorityNotExists_thenReturnEmptyOptional() {
     // Prepare
     final var name = "COOK";
 
