@@ -10,6 +10,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import com.archipio.userservice.dto.ErrorDto;
 import com.archipio.userservice.exception.BadPasswordException;
 import com.archipio.userservice.exception.EmailAlreadyExistsException;
+import com.archipio.userservice.exception.InvalidOrExpiredConfirmationTokenException;
 import com.archipio.userservice.exception.UserNotFoundException;
 import com.archipio.userservice.exception.UsernameAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -170,6 +171,21 @@ public class ExceptionCatcher {
                     messageSource.getMessage(
                         "exception.bad-password", null, RequestContextUtils.getLocale(request)))
                 .build());
+  }
+
+  @ExceptionHandler(InvalidOrExpiredConfirmationTokenException.class)
+  public ResponseEntity<ErrorDto> handleInvalidOrExpiredTokenException(
+          HttpServletRequest request, InvalidOrExpiredConfirmationTokenException e) {
+    return ResponseEntity.status(BAD_REQUEST)
+            .body(
+                    ErrorDto.builder()
+                            .createdAt(Instant.now())
+                            .message(
+                                    messageSource.getMessage(
+                                            "exception.invalid-or-expired-confirmation-token",
+                                            null,
+                                            RequestContextUtils.getLocale(request)))
+                            .build());
   }
 
   @ExceptionHandler(AccessDeniedException.class)

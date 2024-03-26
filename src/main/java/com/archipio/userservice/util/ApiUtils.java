@@ -9,6 +9,7 @@ public class ApiUtils {
   public static final String FIND_PROFILE_SUFFIX = "";
   public static final String UPDATE_USERNAME_SUFFIX = "/update-username";
   public static final String UPDATE_EMAIL_SUFFIX = "/update-email";
+  public static final String UPDATE_EMAIL_CONFIRM_SUFFIX = "/update-email/confirm";
   public static final String SYS_V0_PREFIX = "/sys/v0/users";
   public static final String SAVE_CREDENTIALS_SUFFIX = "";
   public static final String FIND_CREDENTIALS_SUFFIX = "";

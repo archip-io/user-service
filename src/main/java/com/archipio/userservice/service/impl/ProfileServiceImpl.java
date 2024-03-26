@@ -4,6 +4,7 @@ import static com.archipio.userservice.util.CacheUtils.UPDATE_EMAIL_CACHE_TTL_S;
 
 import com.archipio.userservice.dto.ProfileDto;
 import com.archipio.userservice.exception.EmailAlreadyExistsException;
+import com.archipio.userservice.exception.InvalidOrExpiredConfirmationTokenException;
 import com.archipio.userservice.exception.UserNotFoundException;
 import com.archipio.userservice.exception.UsernameAlreadyExistsException;
 import com.archipio.userservice.mapper.UserMapper;
@@ -65,6 +66,26 @@ public class ProfileServiceImpl implements ProfileService {
         .set(UPDATE_EMAIL_KEY_PREFIX + token, cache, UPDATE_EMAIL_CACHE_TTL_S, TimeUnit.SECONDS);
 
     // TODO: Добавить событие отправки письма
+  }
+
+  @Override
+  public void updateEmailConfirm(String username, String token) {
+    var registrationDto = redisTemplate.opsForValue().get(UPDATE_EMAIL_KEY_PREFIX + token);
+    if (registrationDto == null || !registrationDto.getUsername().equals(username)) {
+      throw new InvalidOrExpiredConfirmationTokenException();
+    }
+
+    redisTemplate.opsForValue().getAndDelete(UPDATE_EMAIL_KEY_PREFIX + token);
+
+    var user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+    if (userRepository.existsByEmail(registrationDto.newEmail)) {
+      throw new EmailAlreadyExistsException();
+    }
+
+    user.setEmail(registrationDto.getNewEmail());
+    userRepository.save(user);
+
+    // TODO: Добавить событие о смене email
   }
 
   @Getter

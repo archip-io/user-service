@@ -9,4 +9,6 @@ public interface ProfileService {
   void updateUsername(String username, String newUsername);
 
   void updateEmail(String username, String newEmail);
+
+  void updateEmailConfirm(String username, String token);
 }
