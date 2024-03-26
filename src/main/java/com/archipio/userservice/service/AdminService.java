@@ -5,4 +5,6 @@ public interface AdminService {
   void banAccount(String username);
 
   void unbanAccount(String username);
+
+  void deleteUserAccount(String username);
 }
