@@ -2,6 +2,7 @@ package com.archipio.userservice.controller.api.v0;
 
 import static com.archipio.userservice.util.ApiUtils.API_V0_PREFIX;
 import static com.archipio.userservice.util.ApiUtils.FIND_PROFILE_SUFFIX;
+import static com.archipio.userservice.util.ApiUtils.UPDATE_EMAIL_CONFIRM_SUFFIX;
 import static com.archipio.userservice.util.ApiUtils.UPDATE_EMAIL_SUFFIX;
 import static com.archipio.userservice.util.ApiUtils.UPDATE_USERNAME_SUFFIX;
 import static org.springframework.http.HttpStatus.ACCEPTED;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -50,11 +52,20 @@ public class ProfileController {
   @PreAuthorize("hasAuthority('UPDATE_EMAIL')")
   @PutMapping(UPDATE_EMAIL_SUFFIX)
   public ResponseEntity<Void> updateEmail(
-      @Valid @RequestBody UpdateEmailDto updateEmailDto,
-      @AuthenticationPrincipal UserDetailsImpl principal) {
+          @Valid @RequestBody UpdateEmailDto updateEmailDto,
+          @AuthenticationPrincipal UserDetailsImpl principal) {
     if (!principal.getEmail().equals(updateEmailDto.getEmail())) {
       profileService.updateEmail(principal.getUsername(), updateEmailDto.getEmail());
     }
     return ResponseEntity.status(ACCEPTED).build();
+  }
+
+  @PreAuthorize("hasAuthority('UPDATE_EMAIL')")
+  @GetMapping(UPDATE_EMAIL_CONFIRM_SUFFIX)
+  public ResponseEntity<Void> updateEmailConfirm(
+          @RequestParam("token") String token,
+          @AuthenticationPrincipal UserDetailsImpl principal) {
+    profileService.updateEmailConfirm(principal.getUsername(), token);
+    return ResponseEntity.status(OK).build();
   }
 }

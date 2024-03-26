@@ -3,6 +3,7 @@ package com.archipio.userservice.unittest.service.impl;
 import static com.archipio.userservice.util.CacheUtils.UPDATE_EMAIL_CACHE_TTL_S;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.endsWith;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -13,6 +14,7 @@ import static org.mockito.quality.Strictness.LENIENT;
 
 import com.archipio.userservice.dto.ProfileDto;
 import com.archipio.userservice.exception.EmailAlreadyExistsException;
+import com.archipio.userservice.exception.InvalidOrExpiredConfirmationTokenException;
 import com.archipio.userservice.exception.UserNotFoundException;
 import com.archipio.userservice.exception.UsernameAlreadyExistsException;
 import com.archipio.userservice.mapper.UserMapper;
@@ -208,5 +210,126 @@ class ProfileServiceImplTest {
     // Check
     verify(userRepository, times(1)).existsByUsername(username);
     verify(userRepository, times(1)).existsByEmail(newEmail);
+  }
+
+  @Test
+  public void updateEmailConfirm_whenTokenIsValidAndUserExistsAndNewEmailIsFree_thenUpdateEmail() {
+    // Prepare
+    final var username = "user";
+    final var newEmail = "user@mail.ru";
+    final var token = "token";
+    var updateEmailCache =
+        ProfileServiceImpl.UpdateEmailCache.builder().username(username).newEmail(newEmail).build();
+    var user = new User();
+    var mockValueOperations = mock(ValueOperations.class);
+
+    when(redisTemplate.opsForValue()).thenReturn(mockValueOperations);
+    when(mockValueOperations.get(endsWith(token))).thenReturn(updateEmailCache);
+    when(mockValueOperations.getAndDelete(endsWith(token))).thenReturn(updateEmailCache);
+    when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+    when(userRepository.existsByEmail(newEmail)).thenReturn(false);
+    when(userRepository.save(user)).thenReturn(user);
+
+    // Do
+    profileService.updateEmailConfirm(username, token);
+
+    // Check
+    verify(redisTemplate, times(2)).opsForValue();
+    verify(mockValueOperations, times(1)).get(endsWith(token));
+    verify(mockValueOperations, times(1)).getAndDelete(endsWith(token));
+    verify(userRepository, times(1)).findByUsername(username);
+    verify(userRepository, times(1)).existsByEmail(newEmail);
+    verify(userRepository, times(1)).save(user);
+  }
+
+  @Test
+  public void updateEmailConfirm_whenTokenHasExpired_thenInvalidOrExpiredConfirmationTokenException() {
+    // Prepare
+    final var username = "user";
+    final var token = "token";
+    var mockValueOperations = mock(ValueOperations.class);
+
+    when(redisTemplate.opsForValue()).thenReturn(mockValueOperations);
+    when(mockValueOperations.get(endsWith(token))).thenReturn(null);
+
+    // Do
+    assertThatExceptionOfType(InvalidOrExpiredConfirmationTokenException.class)
+            .isThrownBy(() -> profileService.updateEmailConfirm(username, token));
+
+    // Check
+    verify(redisTemplate, times(1)).opsForValue();
+    verify(mockValueOperations, times(1)).get(endsWith(token));
+  }
+
+  @Test
+  public void updateEmailConfirm_whenTokenIsInvalid_thenInvalidOrExpiredConfirmationTokenException() {
+    // Prepare
+    final var username = "user";
+    final var otherUsername = "other_user";
+    final var token = "token";
+    var updateEmailCache =
+            ProfileServiceImpl.UpdateEmailCache.builder().username(otherUsername).build();
+    var mockValueOperations = mock(ValueOperations.class);
+
+    when(redisTemplate.opsForValue()).thenReturn(mockValueOperations);
+    when(mockValueOperations.get(endsWith(token))).thenReturn(updateEmailCache);
+
+    // Do
+    assertThatExceptionOfType(InvalidOrExpiredConfirmationTokenException.class)
+            .isThrownBy(() -> profileService.updateEmailConfirm(username, token));
+
+    // Check
+    verify(redisTemplate, times(1)).opsForValue();
+    verify(mockValueOperations, times(1)).get(endsWith(token));
+  }
+
+  @Test
+  public void updateEmailConfirm_whenTokenIsValidAndUserNotExists_thenUserNotFoundException() {
+    // Prepare
+    final var username = "user";
+    final var token = "token";
+    var updateEmailCache =
+            ProfileServiceImpl.UpdateEmailCache.builder().username(username).build();
+    var mockValueOperations = mock(ValueOperations.class);
+
+    when(redisTemplate.opsForValue()).thenReturn(mockValueOperations);
+    when(mockValueOperations.get(endsWith(token))).thenReturn(updateEmailCache);
+    when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+    // Do
+    assertThatExceptionOfType(UserNotFoundException.class)
+            .isThrownBy(() -> profileService.updateEmailConfirm(username, token));
+
+    // Check
+    verify(redisTemplate, times(2)).opsForValue();
+    verify(mockValueOperations, times(1)).get(endsWith(token));
+    verify(userRepository, times(1)).findByUsername(username);
+  }
+
+  @Test
+  public void updateEmailConfirm_whenTokenIsValidAndUserExistsAndEmailAlreadyExists_thenEmailAlreadyExistsException() {
+    // Prepare
+    final var username = "user";
+    final var newEmail = "user@mail.ru";
+    final var token = "token";
+    var updateEmailCache =
+            ProfileServiceImpl.UpdateEmailCache.builder().username(username).newEmail(newEmail).build();
+    var user = new User();
+    var mockValueOperations = mock(ValueOperations.class);
+
+    when(redisTemplate.opsForValue()).thenReturn(mockValueOperations);
+    when(mockValueOperations.get(endsWith(token))).thenReturn(updateEmailCache);
+    when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+    when(userRepository.existsByEmail(updateEmailCache.getNewEmail())).thenReturn(true);
+
+    // Do
+    assertThatExceptionOfType(EmailAlreadyExistsException.class)
+            .isThrownBy(() -> profileService.updateEmailConfirm(username, token));
+
+    // Check
+    verify(redisTemplate, times(2)).opsForValue();
+    verify(mockValueOperations, times(1)).get(endsWith(token));
+    verify(userRepository, times(1)).findByUsername(username);
+    verify(userRepository, times(1)).existsByEmail(updateEmailCache.getNewEmail());
   }
 }
