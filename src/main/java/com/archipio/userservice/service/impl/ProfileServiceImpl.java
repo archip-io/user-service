@@ -22,8 +22,10 @@ import lombok.Setter;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ProfileServiceImpl implements ProfileService {
 
@@ -40,6 +42,7 @@ public class ProfileServiceImpl implements ProfileService {
     return userMapper.toProfile(user);
   }
 
+  @Transactional
   @Override
   public void updateUsername(String username, String newUsername) {
     var user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
@@ -71,6 +74,7 @@ public class ProfileServiceImpl implements ProfileService {
     // TODO: Добавить событие отправки письма
   }
 
+  @Transactional
   @Override
   public void updateEmailConfirm(String username, String token) {
     var registrationDto = redisTemplate.opsForValue().get(UPDATE_EMAIL_KEY_PREFIX + token);
@@ -91,6 +95,7 @@ public class ProfileServiceImpl implements ProfileService {
     // TODO: Добавить событие о смене email
   }
 
+  @Transactional
   @Override
   public void updatePassword(String username, String oldPassword, String newPassword) {
     var user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
@@ -103,6 +108,13 @@ public class ProfileServiceImpl implements ProfileService {
 
     user.setPassword(passwordEncoder.encode(newPassword));
     userRepository.save(user);
+  }
+
+  @Transactional
+  @Override
+  public void deleteAccount(String username) {
+    var user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+    userRepository.delete(user);
   }
 
   @Getter

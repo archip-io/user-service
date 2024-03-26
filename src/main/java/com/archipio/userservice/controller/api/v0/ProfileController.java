@@ -1,12 +1,14 @@
 package com.archipio.userservice.controller.api.v0;
 
 import static com.archipio.userservice.util.ApiUtils.API_V0_PREFIX;
+import static com.archipio.userservice.util.ApiUtils.DELETE_ACCOUNT_SUFFIX;
 import static com.archipio.userservice.util.ApiUtils.FIND_PROFILE_SUFFIX;
 import static com.archipio.userservice.util.ApiUtils.UPDATE_EMAIL_CONFIRM_SUFFIX;
 import static com.archipio.userservice.util.ApiUtils.UPDATE_EMAIL_SUFFIX;
 import static com.archipio.userservice.util.ApiUtils.UPDATE_PASSWORD_SUFFIX;
 import static com.archipio.userservice.util.ApiUtils.UPDATE_USERNAME_SUFFIX;
 import static org.springframework.http.HttpStatus.ACCEPTED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 import com.archipio.commonauth.UserDetailsImpl;
@@ -79,6 +81,13 @@ public class ProfileController {
         principal.getUsername(),
         updatePasswordDto.getOldPassword(),
         updatePasswordDto.getNewPassword());
+    return ResponseEntity.status(OK).build();
+  }
+
+  @PreAuthorize("hasAuthority('DELETE_ACCOUNT')")
+  @PutMapping(DELETE_ACCOUNT_SUFFIX)
+  public ResponseEntity<Void> deleteAccount(@AuthenticationPrincipal UserDetailsImpl principal) {
+    profileService.deleteAccount(principal.getUsername());
     return ResponseEntity.status(OK).build();
   }
 }
