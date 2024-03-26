@@ -8,7 +8,6 @@ import static com.archipio.userservice.util.ApiUtils.UPDATE_EMAIL_SUFFIX;
 import static com.archipio.userservice.util.ApiUtils.UPDATE_PASSWORD_SUFFIX;
 import static com.archipio.userservice.util.ApiUtils.UPDATE_USERNAME_SUFFIX;
 import static org.springframework.http.HttpStatus.ACCEPTED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 import com.archipio.commonauth.UserDetailsImpl;

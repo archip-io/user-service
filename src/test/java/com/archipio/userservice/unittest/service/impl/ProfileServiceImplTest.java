@@ -1,6 +1,7 @@
 package com.archipio.userservice.unittest.service.impl;
 
 import static com.archipio.userservice.util.CacheUtils.UPDATE_EMAIL_CACHE_TTL_S;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.endsWith;
@@ -65,11 +66,13 @@ class ProfileServiceImplTest {
     when(userMapper.toProfile(user)).thenReturn(profileDto);
 
     // Do
-    profileService.getProfileByUsername(username);
+    var actualProfileDto = profileService.getProfileByUsername(username);
 
     // Check
     verify(userRepository, times(1)).findByUsername(username);
     verify(userMapper, times(1)).toProfile(user);
+
+    assertThat(actualProfileDto).isEqualTo(profileDto);
   }
 
   @Test
@@ -107,6 +110,8 @@ class ProfileServiceImplTest {
     verify(userRepository, times(1)).findByUsername(username);
     verify(userRepository, times(1)).existsByUsername(newUsername);
     verify(userRepository, times(1)).save(user);
+
+    assertThat(user.getUsername()).isEqualTo(newUsername);
   }
 
   @Test
@@ -243,6 +248,8 @@ class ProfileServiceImplTest {
     verify(userRepository, times(1)).findByUsername(username);
     verify(userRepository, times(1)).existsByEmail(newEmail);
     verify(userRepository, times(1)).save(user);
+
+    assertThat(user.getEmail()).isEqualTo(newEmail);
   }
 
   @Test
@@ -363,6 +370,8 @@ class ProfileServiceImplTest {
     verify(passwordEncoder, times(1)).matches(newPassword, oldPassword);
     verify(passwordEncoder, times(1)).encode(newPassword);
     verify(userRepository, times(1)).save(user);
+
+    assertThat(user.getPassword()).isEqualTo(passwordEncoder.encode(newPassword));
   }
 
   @Test
@@ -451,7 +460,8 @@ class ProfileServiceImplTest {
     when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
     // Do
-    assertThatExceptionOfType(UserNotFoundException.class).isThrownBy(() -> profileService.deleteAccount(username));
+    assertThatExceptionOfType(UserNotFoundException.class)
+        .isThrownBy(() -> profileService.deleteAccount(username));
 
     // Check
     verify(userRepository, times(1)).findByUsername(username);
