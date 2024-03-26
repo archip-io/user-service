@@ -425,4 +425,35 @@ class ProfileServiceImplTest {
     verify(userRepository, times(1)).findByUsername(username);
     verify(passwordEncoder, times(1)).matches(oldPassword, oldPassword);
   }
+
+  @Test
+  public void deleteAccount_whenUserExists_thenDeleteUser() {
+    // Prepare
+    final var username = "user";
+    var user = new User();
+
+    when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+    doNothing().when(userRepository).delete(user);
+
+    // Do
+    profileService.deleteAccount(username);
+
+    // Check
+    verify(userRepository, times(1)).findByUsername(username);
+    verify(userRepository, times(1)).delete(user);
+  }
+
+  @Test
+  public void deleteAccount_whenUserNotExists_thenThrownUserNotFoundException() {
+    // Prepare
+    final var username = "user";
+
+    when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+    // Do
+    assertThatExceptionOfType(UserNotFoundException.class).isThrownBy(() -> profileService.deleteAccount(username));
+
+    // Check
+    verify(userRepository, times(1)).findByUsername(username);
+  }
 }

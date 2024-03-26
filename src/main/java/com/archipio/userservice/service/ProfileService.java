@@ -13,4 +13,6 @@ public interface ProfileService {
   void updateEmailConfirm(String username, String token);
 
   void updatePassword(String username, String oldPassword, String newPassword);
+
+  void deleteAccount(String username);
 }
