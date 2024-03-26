@@ -2,6 +2,7 @@ package com.archipio.userservice.unittest.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -69,7 +70,7 @@ class AdminServiceImplTest {
   }
 
   @Test
-  public void unbanAccount_whenUserExists_thenDisableUser() {
+  public void unbanAccount_whenUserExists_thenEnableUser() {
     // Prepare
     final var username = "user";
 
@@ -102,6 +103,43 @@ class AdminServiceImplTest {
     // Do
     assertThatExceptionOfType(UserNotFoundException.class)
             .isThrownBy(() -> adminService.unbanAccount(username));
+
+    // Check
+    verify(userRepository, times(1)).findByUsername(username);
+  }
+
+  @Test
+  public void deleteUserAccount_whenUserExists_thenDeleteUser() {
+    // Prepare
+    final var username = "user";
+
+    final var user = new User();
+    user.setUsername(username);
+
+    when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+    doNothing().when(userRepository).delete(user);
+
+    // Do
+    adminService.deleteUserAccount(username);
+
+    // Check
+    verify(userRepository, times(1)).findByUsername(username);
+    verify(userRepository, times(1)).delete(user);
+  }
+
+  @Test
+  public void deleteUserAccount_whenUserNotExists_thenThrownUserNotFoundException() {
+    // Prepare
+    final var username = "user";
+
+    final var user = new User();
+    user.setUsername(username);
+
+    when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+    // Do
+    assertThatExceptionOfType(UserNotFoundException.class)
+            .isThrownBy(() -> adminService.deleteUserAccount(username));
 
     // Check
     verify(userRepository, times(1)).findByUsername(username);

@@ -15,6 +15,7 @@ public class AdminServiceImpl implements AdminService {
   private final UserRepository userRepository;
 
   @Transactional
+  @Override
   public void banAccount(String username) {
     var user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
@@ -22,11 +23,19 @@ public class AdminServiceImpl implements AdminService {
     userRepository.save(user);
   }
 
+  @Transactional
   @Override
   public void unbanAccount(String username) {
     var user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
     user.setIsEnabled(true);
     userRepository.save(user);
+  }
+
+  @Transactional
+  @Override
+  public void deleteUserAccount(String username) {
+    var user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+    userRepository.delete(user);
   }
 }
