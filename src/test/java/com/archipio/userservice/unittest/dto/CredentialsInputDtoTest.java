@@ -122,7 +122,7 @@ public class CredentialsInputDtoTest {
 
   @ParameterizedTest
   @MethodSource("provideInvalidCredentialsInputDto")
-  public void validate_invalidCredentialsInputDto_violationsIsNotEmpty(
+  public void validate_whenCredentialsInputDtoIsInvalid_thenViolationsIsNotEmpty(
       CredentialsInputDto credentialsInputDto, Set<String> expectedErrorFields) {
     // Do
     var violations = validator.validate(credentialsInputDto);

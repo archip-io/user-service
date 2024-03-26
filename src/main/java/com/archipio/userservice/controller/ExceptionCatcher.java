@@ -59,8 +59,7 @@ public class ExceptionCatcher {
   }
 
   @ExceptionHandler(NoHandlerFoundException.class)
-  public ResponseEntity<ErrorDto> handleNoHandlerFoundException(
-      HttpServletRequest request, NoHandlerFoundException e) {
+  public ResponseEntity<ErrorDto> handleNoHandlerFoundException(HttpServletRequest request) {
     return ResponseEntity.status(NOT_FOUND)
         .body(
             ErrorDto.builder()
@@ -75,7 +74,7 @@ public class ExceptionCatcher {
 
   @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
   public ResponseEntity<ErrorDto> handleHttpRequestMethodNotSupportedException(
-      HttpServletRequest request, HttpRequestMethodNotSupportedException e) {
+      HttpServletRequest request) {
     return ResponseEntity.status(METHOD_NOT_ALLOWED)
         .body(
             ErrorDto.builder()
@@ -90,7 +89,7 @@ public class ExceptionCatcher {
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
   public ResponseEntity<ErrorDto> handleHttpMessageNotReadableException(
-      HttpServletRequest request, HttpMessageNotReadableException e) {
+      HttpServletRequest request) {
     return ResponseEntity.status(BAD_REQUEST)
         .body(
             ErrorDto.builder()
@@ -105,7 +104,7 @@ public class ExceptionCatcher {
 
   @ExceptionHandler(MissingServletRequestParameterException.class)
   public ResponseEntity<ErrorDto> handleMissingServletRequestParameterException(
-      HttpServletRequest request, MissingServletRequestParameterException e) {
+      HttpServletRequest request) {
     return ResponseEntity.status(BAD_REQUEST)
         .body(
             ErrorDto.builder()
@@ -119,8 +118,7 @@ public class ExceptionCatcher {
   }
 
   @ExceptionHandler(UsernameAlreadyExistsException.class)
-  public ResponseEntity<ErrorDto> handleUsernameAlreadyExistsException(
-      HttpServletRequest request, UsernameAlreadyExistsException e) {
+  public ResponseEntity<ErrorDto> handleUsernameAlreadyExistsException(HttpServletRequest request) {
     return ResponseEntity.status(CONFLICT)
         .body(
             ErrorDto.builder()
@@ -134,8 +132,7 @@ public class ExceptionCatcher {
   }
 
   @ExceptionHandler(EmailAlreadyExistsException.class)
-  public ResponseEntity<ErrorDto> handleEmailAlreadyExistsException(
-      HttpServletRequest request, EmailAlreadyExistsException e) {
+  public ResponseEntity<ErrorDto> handleEmailAlreadyExistsException(HttpServletRequest request) {
     return ResponseEntity.status(CONFLICT)
         .body(
             ErrorDto.builder()
@@ -149,8 +146,7 @@ public class ExceptionCatcher {
   }
 
   @ExceptionHandler(UserNotFoundException.class)
-  public ResponseEntity<ErrorDto> handleUserNotFoundException(
-      HttpServletRequest request, UserNotFoundException e) {
+  public ResponseEntity<ErrorDto> handleUserNotFoundException(HttpServletRequest request) {
     return ResponseEntity.status(NOT_FOUND)
         .body(
             ErrorDto.builder()
@@ -162,8 +158,7 @@ public class ExceptionCatcher {
   }
 
   @ExceptionHandler(BadPasswordException.class)
-  public ResponseEntity<ErrorDto> handleBadPasswordException(
-      HttpServletRequest request, BadPasswordException e) {
+  public ResponseEntity<ErrorDto> handleBadPasswordException(HttpServletRequest request) {
     return ResponseEntity.status(BAD_REQUEST)
         .body(
             ErrorDto.builder()
@@ -175,8 +170,7 @@ public class ExceptionCatcher {
   }
 
   @ExceptionHandler(BadOldPasswordException.class)
-  public ResponseEntity<ErrorDto> handleBadOldPasswordException(
-      HttpServletRequest request, BadOldPasswordException e) {
+  public ResponseEntity<ErrorDto> handleBadOldPasswordException(HttpServletRequest request) {
     return ResponseEntity.status(BAD_REQUEST)
         .body(
             ErrorDto.builder()
@@ -188,8 +182,7 @@ public class ExceptionCatcher {
   }
 
   @ExceptionHandler(InvalidOrExpiredConfirmationTokenException.class)
-  public ResponseEntity<ErrorDto> handleInvalidOrExpiredTokenException(
-      HttpServletRequest request, InvalidOrExpiredConfirmationTokenException e) {
+  public ResponseEntity<ErrorDto> handleInvalidOrExpiredTokenException(HttpServletRequest request) {
     return ResponseEntity.status(BAD_REQUEST)
         .body(
             ErrorDto.builder()
@@ -203,8 +196,7 @@ public class ExceptionCatcher {
   }
 
   @ExceptionHandler(AccessDeniedException.class)
-  public ResponseEntity<ErrorDto> handleAccessDeniedException(
-      HttpServletRequest request, AccessDeniedException e) {
+  public ResponseEntity<ErrorDto> handleAccessDeniedException(HttpServletRequest request) {
     return ResponseEntity.status(FORBIDDEN)
         .body(
             ErrorDto.builder()
@@ -216,7 +208,7 @@ public class ExceptionCatcher {
   }
 
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<ErrorDto> handleException(HttpServletRequest request, Exception e) {
+  public ResponseEntity<ErrorDto> handleException(HttpServletRequest request) {
     return ResponseEntity.status(INTERNAL_SERVER_ERROR)
         .body(
             ErrorDto.builder()

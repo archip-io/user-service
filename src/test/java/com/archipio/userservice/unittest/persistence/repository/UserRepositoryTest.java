@@ -18,7 +18,7 @@ class UserRepositoryTest {
   @Autowired private UserRepository userRepository;
 
   @Test
-  void existsByUsername_userExists_true() {
+  void existsByUsername_whenUserExists_thenReturnTrue() {
     // Prepare
     final var username = "username";
     final var email = "email";
@@ -41,7 +41,7 @@ class UserRepositoryTest {
   }
 
   @Test
-  void existsByUsername_userNotExists_false() {
+  void existsByUsername_whenUserNotExists_thenReturnFalse() {
     // Prepare
     final var username = "username";
 
@@ -53,7 +53,7 @@ class UserRepositoryTest {
   }
 
   @Test
-  void existsByEmail_userExists_true() {
+  void existsByEmail_whenUserExists_thenReturnTrue() {
     // Prepare
     final var username = "username";
     final var email = "email";
@@ -76,7 +76,7 @@ class UserRepositoryTest {
   }
 
   @Test
-  void existsByEmail_userNotExists_false() {
+  void existsByEmail_whenUserNotExists_thenReturnFalse() {
     // Prepare
     final var email = "email";
 
@@ -88,7 +88,7 @@ class UserRepositoryTest {
   }
 
   @Test
-  void findByLogin_userExistsAndLoginIsUsername_optionalUser() {
+  void findByLogin_whenUserExistsAndLoginIsUsername_thenReturnUser() {
     // Prepare
     final var username = "username";
     final var email = "email";
@@ -112,7 +112,7 @@ class UserRepositoryTest {
   }
 
   @Test
-  void findByLogin_userExistsAndLoginIsEmail_optionalUser() {
+  void findByLogin_whenUserExistsAndLoginIsEmail_thenReturnUser() {
     // Prepare
     final var username = "username";
     final var email = "email";
@@ -136,7 +136,7 @@ class UserRepositoryTest {
   }
 
   @Test
-  void findByLogin_userNotExists_emptyOptional() {
+  void findByLogin_whenUserNotExists_thenEmptyOptional() {
     // Prepare
     final var login = "login";
 
@@ -148,7 +148,7 @@ class UserRepositoryTest {
   }
 
   @Test
-  void findByUsernameAndEmail_userExists_optionalUser() {
+  void findByUsernameAndEmail_whenUserExists_thenReturnUser() {
     // Prepare
     final var username = "username";
     final var email = "email";
@@ -172,7 +172,7 @@ class UserRepositoryTest {
   }
 
   @Test
-  void findByUsernameAndEmail_userNotExists_emptyOptional() {
+  void findByUsernameAndEmail_whenUserNotExists_thenReturnEmptyOptional() {
     // Prepare
     final var username = "username";
     final var email = "email";
@@ -185,7 +185,7 @@ class UserRepositoryTest {
   }
 
   @Test
-  void findByUsername_userExists_optionalUser() {
+  void findByUsername_whenUserExists_thenReturnUser() {
     // Prepare
     final var username = "username";
     final var email = "email";
@@ -209,7 +209,7 @@ class UserRepositoryTest {
   }
 
   @Test
-  void findByUsername_userNotExists_emptyOptional() {
+  void findByUsername_whenUserNotExists_thenEmptyOptional() {
     // Prepare
     final var username = "username";
 

@@ -39,7 +39,7 @@ public class UpdateUsernameDtoTest {
 
   @ParameterizedTest
   @MethodSource("provideInvalidUpdateUsernameDto")
-  public void validate_invalidCredentialsInputDto_violationsIsNotEmpty(
+  public void validate_whenUpdateUsernameDtoIsInvalid_thenViolationsIsNotEmpty(
       UpdateUsernameDto updateUsernameDto, Set<String> expectedErrorFields) {
     // Do
     var violations = validator.validate(updateUsernameDto);

@@ -10,14 +10,14 @@ import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificationExecutor<User> {
 
-  boolean existsByUsername(String username);
-
-  boolean existsByEmail(String email);
-
   @Query("SELECT u FROM User u WHERE u.username = :login OR u.email = :login")
   Optional<User> findByLogin(@Param("login") String login);
 
   Optional<User> findByUsernameAndEmail(String username, String email);
 
   Optional<User> findByUsername(String username);
+
+  boolean existsByUsername(String username);
+
+  boolean existsByEmail(String email);
 }

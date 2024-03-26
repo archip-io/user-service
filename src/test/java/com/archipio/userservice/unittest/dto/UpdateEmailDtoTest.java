@@ -33,7 +33,7 @@ public class UpdateEmailDtoTest {
 
   @ParameterizedTest
   @MethodSource("provideInvalidUpdateEmailDto")
-  public void validate_invalidUpdateEmailDto_violationsIsNotEmpty(
+  public void validate_whenUpdateEmailDtoIsInvalid_thenViolationsIsNotEmpty(
       UpdateEmailDto updateEmailDto, Set<String> expectedErrorFields) {
     // Do
     var violations = validator.validate(updateEmailDto);

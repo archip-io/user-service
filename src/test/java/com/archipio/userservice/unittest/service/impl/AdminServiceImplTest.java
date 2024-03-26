@@ -2,6 +2,7 @@ package com.archipio.userservice.unittest.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -13,10 +14,14 @@ import com.archipio.userservice.persistence.entity.User;
 import com.archipio.userservice.persistence.repository.UserRepository;
 import com.archipio.userservice.service.impl.AdminServiceImpl;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -29,6 +34,18 @@ class AdminServiceImplTest {
 
   @Mock private UserRepository userRepository;
   @InjectMocks private AdminServiceImpl adminService;
+
+  private static Stream<Arguments> provideNullParameters_banAccount() {
+    return Stream.of(Arguments.of((String) null));
+  }
+
+  private static Stream<Arguments> provideNullParameters_unbanAccount() {
+    return Stream.of(Arguments.of((String) null));
+  }
+
+  private static Stream<Arguments> provideNullParameters_deleteUserAccount() {
+    return Stream.of(Arguments.of((String) null));
+  }
 
   @Test
   public void banAccount_whenUserExists_thenDisableUser() {
@@ -51,6 +68,12 @@ class AdminServiceImplTest {
     assertThat(user.getIsEnabled()).isFalse();
   }
 
+  @ParameterizedTest
+  @MethodSource("provideNullParameters_banAccount")
+  public void banAccount_whenParametersIsNull_thenNullPointerException(String username) {
+    assertThatNullPointerException().isThrownBy(() -> adminService.banAccount(username));
+  }
+
   @Test
   public void banAccount_whenUserNotExists_thenThrownUserNotFoundException() {
     // Prepare
@@ -63,7 +86,7 @@ class AdminServiceImplTest {
 
     // Do
     assertThatExceptionOfType(UserNotFoundException.class)
-            .isThrownBy(() -> adminService.banAccount(username));
+        .isThrownBy(() -> adminService.banAccount(username));
 
     // Check
     verify(userRepository, times(1)).findByUsername(username);
@@ -90,6 +113,12 @@ class AdminServiceImplTest {
     assertThat(user.getIsEnabled()).isTrue();
   }
 
+  @ParameterizedTest
+  @MethodSource("provideNullParameters_unbanAccount")
+  public void unbanAccount_whenParametersIsNull_thenNullPointerException(String username) {
+    assertThatNullPointerException().isThrownBy(() -> adminService.unbanAccount(username));
+  }
+
   @Test
   public void unbanAccount_whenUserNotExists_thenThrownUserNotFoundException() {
     // Prepare
@@ -102,7 +131,7 @@ class AdminServiceImplTest {
 
     // Do
     assertThatExceptionOfType(UserNotFoundException.class)
-            .isThrownBy(() -> adminService.unbanAccount(username));
+        .isThrownBy(() -> adminService.unbanAccount(username));
 
     // Check
     verify(userRepository, times(1)).findByUsername(username);
@@ -127,6 +156,12 @@ class AdminServiceImplTest {
     verify(userRepository, times(1)).delete(user);
   }
 
+  @ParameterizedTest
+  @MethodSource("provideNullParameters_deleteUserAccount")
+  public void deleteUserAccount_whenParametersIsNull_thenNullPointerException(String username) {
+    assertThatNullPointerException().isThrownBy(() -> adminService.deleteUserAccount(username));
+  }
+
   @Test
   public void deleteUserAccount_whenUserNotExists_thenThrownUserNotFoundException() {
     // Prepare
@@ -139,7 +174,7 @@ class AdminServiceImplTest {
 
     // Do
     assertThatExceptionOfType(UserNotFoundException.class)
-            .isThrownBy(() -> adminService.deleteUserAccount(username));
+        .isThrownBy(() -> adminService.deleteUserAccount(username));
 
     // Check
     verify(userRepository, times(1)).findByUsername(username);

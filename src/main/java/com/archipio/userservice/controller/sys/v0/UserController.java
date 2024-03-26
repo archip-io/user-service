@@ -20,8 +20,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -68,7 +68,7 @@ public class UserController {
     throw new MissingServletRequestParameterException("login", String.class.getTypeName());
   }
 
-  @PutMapping(RESET_PASSWORD_SUFFIX)
+  @PatchMapping(RESET_PASSWORD_SUFFIX)
   @Operation(
       summary = "Сброс пароля",
       description = "Ищет учетные данные по логину и в случае успеха изменяет пароль на новый")

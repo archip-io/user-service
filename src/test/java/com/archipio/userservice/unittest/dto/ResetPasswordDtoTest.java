@@ -53,7 +53,7 @@ public class ResetPasswordDtoTest {
 
   @ParameterizedTest
   @MethodSource("provideInvalidResetPasswordDto")
-  public void validate_invalidResetPasswordDto_violationsIsNotEmpty(
+  public void validate_whenResetPasswordDtoIsInvalid_thenViolationsIsNotEmpty(
       ResetPasswordDto resetPasswordDto, Set<String> expectedErrorFields) {
     // Do
     var violations = validator.validate(resetPasswordDto);
