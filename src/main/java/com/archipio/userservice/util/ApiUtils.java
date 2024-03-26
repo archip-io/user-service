@@ -12,6 +12,8 @@ public class ApiUtils {
   public static final String UPDATE_EMAIL_CONFIRM_SUFFIX = "/update-email/confirm";
   public static final String UPDATE_PASSWORD_SUFFIX = "/update-password";
   public static final String DELETE_ACCOUNT_SUFFIX = "";
+  public static final String ADMIN_PREFIX = "/admin";
+  public static final String BAN_SUFFIX = "/ban";
   public static final String SYS_V0_PREFIX = "/sys/v0/users";
   public static final String SAVE_CREDENTIALS_SUFFIX = "";
   public static final String FIND_CREDENTIALS_SUFFIX = "";
