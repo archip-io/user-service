@@ -51,9 +51,7 @@ public class ExceptionCatcher {
         .body(
             ErrorDto.builder()
                 .createdAt(Instant.now())
-                .message(
-                    messageSource.getMessage(
-                        "exception.validation-error", null, RequestContextUtils.getLocale(request)))
+                .message(getMessage("exception.validation-error", request))
                 .errors(errors)
                 .build());
   }
@@ -64,11 +62,7 @@ public class ExceptionCatcher {
         .body(
             ErrorDto.builder()
                 .createdAt(Instant.now())
-                .message(
-                    messageSource.getMessage(
-                        "exception.endpoint-not-found",
-                        null,
-                        RequestContextUtils.getLocale(request)))
+                .message(getMessage("exception.endpoint-not-found", request))
                 .build());
   }
 
@@ -79,11 +73,7 @@ public class ExceptionCatcher {
         .body(
             ErrorDto.builder()
                 .createdAt(Instant.now())
-                .message(
-                    messageSource.getMessage(
-                        "exception.method-not-supported",
-                        null,
-                        RequestContextUtils.getLocale(request)))
+                .message(getMessage("exception.method-not-supported", request))
                 .build());
   }
 
@@ -94,11 +84,7 @@ public class ExceptionCatcher {
         .body(
             ErrorDto.builder()
                 .createdAt(Instant.now())
-                .message(
-                    messageSource.getMessage(
-                        "exception.invalid-json-format",
-                        null,
-                        RequestContextUtils.getLocale(request)))
+                .message(getMessage("exception.invalid-json-format", request))
                 .build());
   }
 
@@ -109,11 +95,7 @@ public class ExceptionCatcher {
         .body(
             ErrorDto.builder()
                 .createdAt(Instant.now())
-                .message(
-                    messageSource.getMessage(
-                        "exception.missing-request-parameter",
-                        null,
-                        RequestContextUtils.getLocale(request)))
+                .message(getMessage("exception.missing-request-parameter", request))
                 .build());
   }
 
@@ -123,11 +105,7 @@ public class ExceptionCatcher {
         .body(
             ErrorDto.builder()
                 .createdAt(Instant.now())
-                .message(
-                    messageSource.getMessage(
-                        "exception.username-already-exists",
-                        null,
-                        RequestContextUtils.getLocale(request)))
+                .message(getMessage("exception.username-already-exists", request))
                 .build());
   }
 
@@ -137,11 +115,7 @@ public class ExceptionCatcher {
         .body(
             ErrorDto.builder()
                 .createdAt(Instant.now())
-                .message(
-                    messageSource.getMessage(
-                        "exception.email-already-exists",
-                        null,
-                        RequestContextUtils.getLocale(request)))
+                .message(getMessage("exception.email-already-exists", request))
                 .build());
   }
 
@@ -151,9 +125,7 @@ public class ExceptionCatcher {
         .body(
             ErrorDto.builder()
                 .createdAt(Instant.now())
-                .message(
-                    messageSource.getMessage(
-                        "exception.user-not-found", null, RequestContextUtils.getLocale(request)))
+                .message(getMessage("exception.user-not-found", request))
                 .build());
   }
 
@@ -163,9 +135,7 @@ public class ExceptionCatcher {
         .body(
             ErrorDto.builder()
                 .createdAt(Instant.now())
-                .message(
-                    messageSource.getMessage(
-                        "exception.bad-password", null, RequestContextUtils.getLocale(request)))
+                .message(getMessage("exception.bad-password", request))
                 .build());
   }
 
@@ -175,9 +145,7 @@ public class ExceptionCatcher {
         .body(
             ErrorDto.builder()
                 .createdAt(Instant.now())
-                .message(
-                    messageSource.getMessage(
-                        "exception.bad-old-password", null, RequestContextUtils.getLocale(request)))
+                .message(getMessage("exception.bad-old-password", request))
                 .build());
   }
 
@@ -187,11 +155,7 @@ public class ExceptionCatcher {
         .body(
             ErrorDto.builder()
                 .createdAt(Instant.now())
-                .message(
-                    messageSource.getMessage(
-                        "exception.invalid-or-expired-confirmation-token",
-                        null,
-                        RequestContextUtils.getLocale(request)))
+                .message(getMessage("exception.invalid-or-expired-confirmation-token", request))
                 .build());
   }
 
@@ -201,9 +165,7 @@ public class ExceptionCatcher {
         .body(
             ErrorDto.builder()
                 .createdAt(Instant.now())
-                .message(
-                    messageSource.getMessage(
-                        "exception.access-denied", null, RequestContextUtils.getLocale(request)))
+                .message(getMessage("exception.access-denied", request))
                 .build());
   }
 
@@ -213,11 +175,11 @@ public class ExceptionCatcher {
         .body(
             ErrorDto.builder()
                 .createdAt(Instant.now())
-                .message(
-                    messageSource.getMessage(
-                        "exception.internal-server-error",
-                        null,
-                        RequestContextUtils.getLocale(request)))
+                .message(getMessage("exception.internal-server-error", request))
                 .build());
+  }
+
+  private String getMessage(String code, HttpServletRequest request) {
+    return messageSource.getMessage(code, null, RequestContextUtils.getLocale(request));
   }
 }
