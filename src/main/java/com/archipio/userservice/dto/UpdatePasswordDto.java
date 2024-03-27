@@ -19,7 +19,6 @@ import org.hibernate.validator.constraints.Length;
 @Builder
 public class UpdatePasswordDto {
 
-  
   @JsonProperty("old_password")
   private String oldPassword;
 
@@ -29,7 +28,6 @@ public class UpdatePasswordDto {
       max = MAX_PASSWORD_LENGTH,
       message = "{validation.password.length}")
   @Pattern(regexp = PASSWORD_REGEX, message = "{validation.password.pattern}")
-  
   @JsonProperty("new_password")
   private String newPassword;
 }

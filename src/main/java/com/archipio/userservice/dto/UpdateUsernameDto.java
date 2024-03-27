@@ -24,6 +24,5 @@ public class UpdateUsernameDto {
       max = MAX_USERNAME_LENGTH,
       message = "{validation.username.length}")
   @Pattern(regexp = USERNAME_REGEX, message = "{validation.username.pattern}")
-  
   private String username;
 }

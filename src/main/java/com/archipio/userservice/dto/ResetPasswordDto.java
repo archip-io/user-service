@@ -19,7 +19,6 @@ import org.hibernate.validator.constraints.Length;
 public class ResetPasswordDto {
 
   @NotNull(message = "{validation.login.not-null}")
-  
   private String login;
 
   @NotNull(message = "{validation.password.not-null}")
@@ -28,6 +27,5 @@ public class ResetPasswordDto {
       max = MAX_PASSWORD_LENGTH,
       message = "{validation.password.length}")
   @Pattern(regexp = PASSWORD_REGEX, message = "{validation.password.pattern}")
-  
   private String password;
 }

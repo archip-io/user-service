@@ -17,6 +17,5 @@ public class UpdateEmailDto {
 
   @NotNull(message = "{validation.email.not-null}")
   @Email(regexp = EMAIL_REGEX, message = "{validation.email.email}")
-  
   private String email;
 }
