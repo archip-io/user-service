@@ -4,7 +4,6 @@ import static com.archipio.userservice.util.ValidationUtils.MAX_PASSWORD_LENGTH;
 import static com.archipio.userservice.util.ValidationUtils.MIN_PASSWORD_LENGTH;
 import static com.archipio.userservice.util.ValidationUtils.PASSWORD_REGEX;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -20,7 +19,7 @@ import org.hibernate.validator.constraints.Length;
 public class ResetPasswordDto {
 
   @NotNull(message = "{validation.login.not-null}")
-  @Schema(description = "Логин", requiredMode = Schema.RequiredMode.REQUIRED)
+  
   private String login;
 
   @NotNull(message = "{validation.password.not-null}")
@@ -29,6 +28,6 @@ public class ResetPasswordDto {
       max = MAX_PASSWORD_LENGTH,
       message = "{validation.password.length}")
   @Pattern(regexp = PASSWORD_REGEX, message = "{validation.password.pattern}")
-  @Schema(description = "Пароль", requiredMode = Schema.RequiredMode.REQUIRED)
+  
   private String password;
 }
