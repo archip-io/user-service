@@ -5,6 +5,7 @@ import static com.archipio.userservice.util.ApiUtils.API_V0_PREFIX;
 import static com.archipio.userservice.util.ApiUtils.BAN_SUFFIX;
 import static com.archipio.userservice.util.ApiUtils.DELETE_USER_ACCOUNT_SUFFIX;
 import static com.archipio.userservice.util.ApiUtils.UNBAN_SUFFIX;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 import com.archipio.userservice.service.AdminService;
@@ -42,6 +43,6 @@ public class AdminController {
   @DeleteMapping(DELETE_USER_ACCOUNT_SUFFIX + "/{username}")
   public ResponseEntity<Void> deleteUserAccount(@PathVariable("username") String username) {
     adminService.deleteUserAccount(username);
-    return ResponseEntity.status(OK).build();
+    return ResponseEntity.status(NO_CONTENT).build();
   }
 }

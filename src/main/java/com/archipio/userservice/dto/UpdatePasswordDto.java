@@ -4,7 +4,7 @@ import static com.archipio.userservice.util.ValidationUtils.MAX_PASSWORD_LENGTH;
 import static com.archipio.userservice.util.ValidationUtils.MIN_PASSWORD_LENGTH;
 import static com.archipio.userservice.util.ValidationUtils.PASSWORD_REGEX;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -19,7 +19,7 @@ import org.hibernate.validator.constraints.Length;
 @Builder
 public class UpdatePasswordDto {
 
-  @Schema(description = "Старый пароль", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("old_password")
   private String oldPassword;
 
   @NotNull(message = "{validation.password.not-null}")
@@ -28,6 +28,6 @@ public class UpdatePasswordDto {
       max = MAX_PASSWORD_LENGTH,
       message = "{validation.password.length}")
   @Pattern(regexp = PASSWORD_REGEX, message = "{validation.password.pattern}")
-  @Schema(description = "Новый пароль", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("new_password")
   private String newPassword;
 }

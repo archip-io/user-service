@@ -21,8 +21,3 @@ spring:
       host: ${ARCHIPIO_USER_SERVICE_CACHE_HOST}
       port: ${ARCHIPIO_USER_SERVICE_CACHE_PORT}
       password: ${ARCHIPIO_USER_SERVICE_CACHE_PASSWORD}
-springdoc:
-  swagger-ui:
-    path: /swagger-ui
-  api-docs:
-    path: /api-docs

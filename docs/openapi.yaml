@@ -1,0 +1,729 @@
+openapi: 3.0.0
+info:
+  title: User Service
+  description: |-
+    User Service - это микросервис, который отвечает за управление аккаунтами пользователей и предоставляет другим 
+    микросервисам их учётные данные
+  version: 0.0.0
+servers:
+  - url: http://localhost:18082
+    description: Local Server URL
+tags:
+  - name: Account
+    description: Эндпоинты для управления своим аккаунтом и просмотра аккаунтов других пользователей
+  - name: Admin
+    description: Эндпоинты для администрирования
+  - name: System
+    description: Эндпоинты для манипулирования учетными данными пользователей другими микросервисами
+paths:
+  /api/v0/users/{username}:
+    get:
+      tags:
+        - Account
+      summary: Получения профиля пользователя
+      description: Ищет пользователя по имени и в случае успеха возвращает его профильные данные
+      operationId: findProfile
+      parameters:
+        - name: username
+          description: Имя пользователя
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Профиль успешно найден
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ProfileDto'
+        '404':
+          description: Пользователь не найден
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: User not found.
+        '500':
+          description: Ошибка на сервере
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Internal server error.
+  /api/v0/users/update-username:
+    patch:
+      tags:
+        - Account
+      summary: Изменение имени пользователя
+      description: Проверяет свободно ли новое имя пользователя и в случае успеха изменяет имя пользователя на новое
+      operationId: updateUsername
+      security:
+        - bearerAuth:
+            - UPDATE_USERNAME
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUsernameDto'
+        required: true
+      responses:
+        '200':
+          description: Имя пользователя успешно изменено
+        '409':
+          description: Имя пользователя занято
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Username already exists.
+        '500':
+          description: Ошибка на сервере
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Internal server error.
+  /api/v0/users/update-email:
+    patch:
+      tags:
+        - Account
+      summary: Изменение email
+      description: Проверяет свободен ли новый email и в случае успеха отправляет на новый email письмо для подтверждения
+      operationId: updateEmail
+      security:
+        - bearerAuth:
+            - UPDATE_EMAIL
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEmailDto'
+        required: true
+      responses:
+        '202':
+          description: Процесс изменения email начат
+        '409':
+          description: Email занят
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Email already exists.
+        '500':
+          description: Ошибка на сервере
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Internal server error.
+  /api/v0/users/update-email/confirm:
+    get:
+      tags:
+        - Account
+      summary: Подтверждение изменения email
+      description: Проверяет корректность токена и свободен ли новый email и в случае успеха изменяет email
+      operationId: updateEmailConfirm
+      security:
+        - bearerAuth:
+            - UPDATE_EMAIL
+      parameters:
+        - name: token
+          description: Токен
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Email успешно изменен
+        '400':
+          description: Токен некорректный или просроченный
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: The confirmation token is invalid or has expired.
+        '409':
+          description: Email занят
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Email already exists.
+        '500':
+          description: Ошибка на сервере
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Internal server error.
+  /api/v0/users/update-password:
+    patch:
+      tags:
+        - Account
+      summary: Изменение пароля
+      description: Проверяет совпадение старого пароля и корректность нового и в случае успеха изменяет пароль на новый
+      operationId: updatePassword
+      security:
+        - bearerAuth:
+            - UPDATE_PASSWORD
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePasswordDto'
+        required: true
+      responses:
+        '200':
+          description: Пароль успешно изменен
+        '400':
+          description: Неправильный старый пароль; Некорректный новый пароль
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              examples:
+                Неправильный старый пароль:
+                  description: Неправильный старый пароль
+                  value:
+                    created_at: '2024-03-27T03:26:19.385Z'
+                    message: Old password is incorrect.
+                Некорректный новый пароль:
+                  description: Некорректный новый пароль
+                  value:
+                    created_at: '2024-03-27T03:26:19.385Z'
+                    message: 'Validation error:'
+                    errors:
+                      newPassword: The password must contain upper and lowercase Latin letters, a number, and a special character.
+        '500':
+          description: Ошибка на сервере
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Internal server error.
+  /api/v0/users:
+    delete:
+      tags:
+        - Account
+      summary: Удаление своего аккаунта
+      description: Удаляет все учётные данные пользователя из системы
+      operationId: deleteAccount
+      security:
+        - bearerAuth:
+            - DELETE_ACCOUNT
+      responses:
+        '204':
+          description: Аккаунт успешно удален
+        '500':
+          description: Ошибка на сервере
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Internal server error.
+  /api/v0/users/admin/{username}:
+    delete:
+      tags:
+        - Admin
+      summary: Блокировка аккаунта
+      description: Ищет пользователя по имени и в случае успеха блокирует
+      operationId: deleteUserAccount
+      security:
+        - bearerAuth:
+            - DELETE_USER_ACCOUNT
+      parameters:
+        - name: username
+          description: Имя пользователя
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Пользователь успешно удален
+        '404':
+          description: Пользователь не найден
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: User not found.
+        '500':
+          description: Ошибка на сервере
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Internal server error.
+  /api/v0/users/admin/ban/{username}:
+    patch:
+      tags:
+        - Admin
+      summary: Блокировка аккаунта
+      description: Ищет пользователя по имени и в случае успеха блокирует
+      operationId: banAccount
+      security:
+        - bearerAuth:
+            - BAN_ACCOUNT
+      parameters:
+        - name: username
+          description: Имя пользователя
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Пользователь успешно заблокирован
+        '404':
+          description: Пользователь не найден
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: User not found.
+        '500':
+          description: Ошибка на сервере
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Internal server error.
+  /api/v0/users/admin/unban/{username}:
+    patch:
+      tags:
+        - Admin
+      summary: Разблокировка аккаунта
+      description: Ищет пользователя по имени и в случае успеха разблокирует
+      operationId: unbanAccount
+      security:
+        - bearerAuth:
+            - UNBAN_ACCOUNT
+      parameters:
+        - name: username
+          description: Имя пользователя
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Пользователь успешно разблокирован
+        '404':
+          description: Пользователь не найден
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: User not found.
+        '500':
+          description: Ошибка на сервере
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Internal server error.
+  /sys/v0/users:
+    get:
+      tags:
+        - System
+      summary: Получение учетных данных
+      description: Ищет учетные данные по логину или по имени пользователя и email и в случае успеха возвращает их
+      operationId: findCredentialsByLogin
+      parameters:
+        - name: login
+          description: Логин
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: username
+          description: Имя пользователя
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: email
+          description: Email
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Пользователь успешно найден
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/CredentialsOutputDto'
+        '400':
+          description: Пропущен параметр запроса
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Missing request parameter.
+        '404':
+          description: Пользователь не найден
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: User not found.
+        '500':
+          description: Ошибка на сервере
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Internal server error.
+    post:
+      tags:
+        - System
+      summary: Сохранение новых учетных данных
+      description: Проверяет имя пользователя, email и пароль и в случае успеха сохраняет учетные данные в базу
+      operationId: saveCredentials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CredentialsInputDto'
+        required: true
+      responses:
+        '201':
+          description: Пользователь успешно создан
+        '400':
+          description: Некорректные входные данные
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: 'Validation error:'
+                errors:
+                  username: The username must start with a letter and contain only Latin letters, numbers and underscores.
+        '409':
+          description: Имя пользователя или адрес электронной почты заняты
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Username already exists.
+        '500':
+          description: Ошибка на сервере
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Internal server error.
+  /sys/v0/users/validate-password:
+    post:
+      tags:
+        - System
+      summary: Проверка пароля
+      description: Ищет учетные данные по логину и в случае успеха проверяет пароли
+      operationId: validatePassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidatePasswordDto'
+        required: true
+      responses:
+        '200':
+          description: Пароль успешно проверен
+        '400':
+          description: Некорректные входные данные; Неправильный пароль
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              examples:
+                Некорректные входные данные:
+                  description: Некорректные входные данные
+                  value:
+                    created_at: '2024-03-27T03:26:19.385Z'
+                    message: 'Validation error:'
+                    errors:
+                      login: The login must be not null.
+                Неправильный пароль:
+                  description: Неправильный пароль
+                  value:
+                    created_at: '2024-03-27T03:26:19.385Z'
+                    message: Password is incorrect.
+        '404':
+          description: Пользователь не найден
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: User not found.
+        '500':
+          description: Ошибка на сервере
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Internal server error.
+  /sys/v0/users/reset-password:
+    patch:
+      tags:
+        - System
+      summary: Сброс пароля
+      description: Ищет учетные данные по логину и в случае успеха изменяет пароль на новый
+      operationId: resetPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordDto'
+        required: true
+      responses:
+        '200':
+          description: Пароль успешно сброшен
+        '400':
+          description: Некорректные входные данные
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: 'Validation error:'
+                errors:
+                  username: The username must be not null.
+        '404':
+          description: Пользователь не найден
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: User not found.
+        '500':
+          description: Ошибка на сервере
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Internal server error.
+components:
+  schemas:
+    ErrorDto:
+      required:
+        - created_at
+        - message
+      type: object
+      properties:
+        message:
+          type: string
+          description: Сообщение ошибки
+          example: 'Validation error:'
+        errors:
+          type: object
+          additionalProperties:
+            type: string
+            description: Название поля и его ошибки
+            example: '{"username":"The username must start with a letter and contain only Latin letters, numbers and underscores."}'
+          description: Название поля и его ошибки
+          example:
+            username: The username must start with a letter and contain only Latin letters, numbers and underscores.
+        created_at:
+          type: string
+          description: Время создания
+          format: date-time
+          example: '2024-03-27T03:57:26.951Z'
+    CredentialsInputDto:
+      required:
+        - email
+        - password
+        - username
+      type: object
+      properties:
+        username:
+          pattern: ^[a-zA-Z]\w+$
+          type: string
+          description: Имя пользователя
+          example: user
+        email:
+          type: string
+          description: Email
+          example: user@mail.ru
+        password:
+          pattern: ^(?=.*[A-Z])(?=.*[\W_])(?=.*[0-9])(?=.*[a-z]).+$
+          type: string
+          description: Пароль
+          example: Password_10
+    ValidatePasswordDto:
+      required:
+        - login
+        - password
+      type: object
+      properties:
+        login:
+          type: string
+          description: Логин
+          example: user
+        password:
+          type: string
+          description: Пароль
+          example: Password_10
+    ResetPasswordDto:
+      required:
+        - login
+        - password
+      type: object
+      properties:
+        login:
+          type: string
+          description: Логин
+          example: user
+        password:
+          pattern: ^(?=.*[A-Z])(?=.*[\W_])(?=.*[0-9])(?=.*[a-z]).+$
+          type: string
+          description: Пароль
+          example: Password_10
+    UpdateUsernameDto:
+      required:
+        - username
+      type: object
+      properties:
+        username:
+          pattern: ^[a-zA-Z]\w+$
+          type: string
+          description: Имя пользователя
+          example: user
+    UpdatePasswordDto:
+      required:
+        - newPassword
+        - oldPassword
+      type: object
+      properties:
+        oldPassword:
+          type: string
+          description: Старый пароль
+          example: OldPassword_10
+        newPassword:
+          pattern: ^(?=.*[A-Z])(?=.*[\W_])(?=.*[0-9])(?=.*[a-z]).+$
+          type: string
+          description: Новый пароль
+          example: NewPassword_10
+    UpdateEmailDto:
+      required:
+        - email
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email
+          example: user@mail.ru
+    CredentialsOutputDto:
+      required:
+        - authorities
+        - email
+        - is_enabled
+        - username
+      type: object
+      properties:
+        username:
+          type: string
+          description: Имя пользователя
+          example: user
+        email:
+          type: string
+          description: Email
+          example: user@mail.ru
+        authorities:
+          uniqueItems: true
+          type: array
+          description: Полномочия
+          example:
+            - UPDATE_USERNAME
+            - UPDATE_EMAIL
+            - UPDATE_PASSWORD
+          items:
+            type: string
+            description: Полномочия
+            example: '["UPDATE_USERNAME","UPDATE_EMAIL","UPDATE_PASSWORD"]'
+        is_enabled:
+          type: boolean
+          description: Заблокирован ли пользователь
+          example: true
+    ProfileDto:
+      required:
+        - email
+        - is_enabled
+        - username
+      type: object
+      properties:
+        username:
+          type: string
+          description: Имя пользователя
+          example: user
+        email:
+          type: string
+          description: Email
+          example: user@mail.ru
+        is_enabled:
+          type: boolean
+          description: Заблокирован ли пользователь
+          example: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
