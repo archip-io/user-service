@@ -74,6 +74,15 @@ paths:
       responses:
         '200':
           description: Имя пользователя успешно изменено
+        '403':
+          description: Нет доступа
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Access denied.
         '409':
           description: Имя пользователя занято
           content:
@@ -111,6 +120,15 @@ paths:
       responses:
         '202':
           description: Процесс изменения email начат
+        '403':
+          description: Нет доступа
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Access denied.
         '409':
           description: Email занят
           content:
@@ -158,6 +176,15 @@ paths:
               example:
                 created_at: '2024-03-27T03:26:19.385Z'
                 message: The confirmation token is invalid or has expired.
+        '403':
+          description: Нет доступа
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Access denied.
         '409':
           description: Email занят
           content:
@@ -214,6 +241,15 @@ paths:
                     message: 'Validation error:'
                     errors:
                       newPassword: The password must contain upper and lowercase Latin letters, a number, and a special character.
+        '403':
+          description: Нет доступа
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Access denied.
         '500':
           description: Ошибка на сервере
           content:
@@ -236,6 +272,15 @@ paths:
       responses:
         '204':
           description: Аккаунт успешно удален
+        '403':
+          description: Нет доступа
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Access denied.
         '500':
           description: Ошибка на сервере
           content:
@@ -265,6 +310,15 @@ paths:
       responses:
         '204':
           description: Пользователь успешно удален
+        '403':
+          description: Нет доступа
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Access denied.
         '404':
           description: Пользователь не найден
           content:
@@ -303,6 +357,15 @@ paths:
       responses:
         '200':
           description: Пользователь успешно заблокирован
+        '403':
+          description: Нет доступа
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Access denied.
         '404':
           description: Пользователь не найден
           content:
@@ -341,6 +404,15 @@ paths:
       responses:
         '200':
           description: Пользователь успешно разблокирован
+        '403':
+          description: Нет доступа
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+              example:
+                created_at: '2024-03-27T03:26:19.385Z'
+                message: Access denied.
         '404':
           description: Пользователь не найден
           content:
